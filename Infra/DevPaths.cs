@@ -379,6 +379,57 @@ public static class DevPaths
         }
     }
 
+    public static string ConfsDirectory
+    {
+        get
+        {
+            string root = DevPaths.RepositoryRoot;
+            if (String.IsNullOrWhiteSpace(root))
+            {
+                return "";
+            }
+
+            string path = Path.Combine(root, "confs");
+
+            return path;
+        }
+    }
+
+    public static string LogsDirectory
+    {
+        get
+        {
+            string root = DevPaths.RepositoryRoot;
+            if (String.IsNullOrWhiteSpace(root))
+            {
+                return "";
+            }
+
+            string path = Path.Combine(root, "logs");
+
+            Directory.CreateDirectory(path);
+
+            return path;
+        }
+    }
+
+    public static string DepsDirectory
+    {
+        get
+        {
+            string root = DevPaths.RepositoryRoot;
+
+            if (String.IsNullOrWhiteSpace(root))
+            {
+                return "";
+            }
+
+            string path = Path.Combine(root, "deps");
+
+            return path;
+        }
+    }
+
     // Linux:
     //   /home/soren/dev/MyApp/src/MyApp/MyApp.csproj
     // Windows:
@@ -558,7 +609,7 @@ public static class DevPaths
     //   /home/soren/.local/share/MyApp/Logs
     // Windows:
     //   C:\Users\Soren\AppData\Local\MyApp\Logs
-    public static string LogsDirectory
+    public static string LogsDirectoryLocal
     {
         get
         {
@@ -578,6 +629,86 @@ public static class DevPaths
         get
         {
             return Path.Combine(DevPaths.LogsDirectory, "application.log");
+        }
+    }
+
+    // Linux:
+    //   /home/soren/.local/share/MyApp/Logs/application.log
+    // Windows:
+    //   C:\Users\Soren\AppData\Local\MyApp\Logs\application.log
+    public static string LogFileLocal
+    {
+        get
+        {
+            return Path.Combine(DevPaths.LogsDirectoryLocal, "application.log");
+        }
+    }
+
+
+    public static string SystemTemp
+    {
+        get
+        {
+            return Path.GetTempPath();
+        }
+    }
+
+    // Linux: /tmp (explicit)
+    public static string LinuxTmp
+    {
+        get
+        {
+            return "/tmp";
+        }
+    }
+
+    // Linux: /var/tmp (persistent temp)
+    public static string LinuxVarTmp
+    {
+        get
+        {
+            return "/var/tmp";
+        }
+    }
+
+    // Windows: %TEMP% resolved explicitly
+    public static string WindowsTemp
+    {
+        get
+        {
+            return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+                + Path.DirectorySeparatorChar + "Temp";
+        }
+    }
+
+    // Session temp (Linux XDG runtime dir)
+    public static string LinuxRuntimeTemp
+    {
+        get
+        {
+            string runtime = Environment.GetEnvironmentVariable("XDG_RUNTIME_DIR");
+
+            if (!String.IsNullOrWhiteSpace(runtime))
+            {
+                return runtime;
+            }
+
+            return "/tmp";
+        }
+    }
+
+    // Generic “best available temp”
+    public static string BestTemp
+    {
+        get
+        {
+            string path = Path.GetTempPath();
+            if (!Directory.Exists(path))
+            {
+                return "/tmp";
+            }
+
+            return path;
         }
     }
 }

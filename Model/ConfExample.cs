@@ -25,8 +25,25 @@ public class AConfig
 
 
 /*
+// example.json
+{
+  "appName": "MyApp",
+  "logLevel": "Debug",
+  "maxThreads": 6,
+  "audio": {
+    "deviceIndex": 2,
+    "sampleRate": 16000,
+    "complex-thing": {
+        "a" : {
+            "b" : 3
+        }
+    }
+  }
+}
+
+
 Example code
-string path = DevPaths.ProjectRoot + "/confs/defaults.json";
+string path = DevPaths.ProjectRoot + "/confs/example.json";
 
 JsonSerialization config = new JsonSerialization(path);
 
