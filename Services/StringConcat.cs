@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 
-public class StrincConcat
+public class StringConcat
 {
     static double _threshold_base = .15;
 
