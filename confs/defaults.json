@@ -1,0 +1,14 @@
+{
+  "appName": "MyApp",
+  "logLevel": "Debug",
+  "maxThreads": 6,
+  "audio": {
+    "deviceIndex": 2,
+    "sampleRate": 16000,
+    "complex-thing": {
+        "a" : {
+            "b" : 3
+        }
+    }
+  }
+}
