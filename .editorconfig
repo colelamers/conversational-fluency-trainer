@@ -1,0 +1,50 @@
+[*.cs]
+csharp_new_line_before_open_brace = none
+
+# var warnings
+csharp_style_var_for_built_in_types = false:warning
+csharp_style_var_when_type_is_apparent = false:warning
+csharp_style_var_elsewhere = false:warning
+
+# Require brackets
+csharp_prefer_braces = true:error
+
+dotnet_style_prefer_conditional_expression_over_return = false:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = false
+
+# Indentation
+indent_style = space
+indent_size = 4
+
+# Put using directives inside namespace
+csharp_using_directive_placement = outside_namespace
+
+# Spaces
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_after_cast = false
+csharp_space_after_comma = true
+csharp_space_after_dot = false
+csharp_space_before_colon_in_inheritance_clause = true
+csharp_space_before_comma = false
+csharp_space_before_dot = false
+
+# Newlines
+csharp_new_line_before_else = false
+csharp_new_line_before_catch = false
+csharp_new_line_before_finally = false
+csharp_new_line_before_members_in_object_initializers = false
+
+# Expression bodies
+csharp_style_expression_bodied_methods = false
+csharp_style_expression_bodied_properties = false
+csharp_style_expression_bodied_accessors = false
+
+# Naming
+dotnet_naming_rule.private_fields_should_be_camel_case.severity = suggestion
+dotnet_naming_rule.private_fields_should_be_camel_case.symbols = private_fields
+dotnet_naming_rule.private_fields_should_be_camel_case.style = camel_case
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+
+dotnet_naming_style.camel_case.capitalization = camel_case

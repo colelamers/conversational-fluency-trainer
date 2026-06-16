@@ -1,7 +1,6 @@
 using System.Reflection;
 
-public static class DevPaths
-{
+public static class DevPaths {
     // --------------------------------------------------------------------
     // EXECUTABLE
     // --------------------------------------------------------------------
@@ -10,10 +9,8 @@ public static class DevPaths
     //   /home/soren/dev/MyApp/bin/Debug/net9.0/MyApp
     // Windows:
     //   C:\Dev\MyApp\bin\Debug\net9.0\MyApp.exe
-    public static string ExecutablePath
-    {
-        get
-        {
+    public static string ExecutablePath {
+        get {
             return Environment.ProcessPath ?? "";
         }
     }
@@ -22,10 +19,8 @@ public static class DevPaths
     //   /home/soren/dev/MyApp/bin/Debug/net9.0/
     // Windows:
     //   C:\Dev\MyApp\bin\Debug\net9.0\
-    public static string ExecutableDirectory
-    {
-        get
-        {
+    public static string ExecutableDirectory {
+        get {
             return AppContext.BaseDirectory;
         }
     }
@@ -34,10 +29,8 @@ public static class DevPaths
     //   MyApp
     // Windows:
     //   MyApp.exe
-    public static string ExecutableFileName
-    {
-        get
-        {
+    public static string ExecutableFileName {
+        get {
             return Path.GetFileName(ExecutablePath);
         }
     }
@@ -46,10 +39,8 @@ public static class DevPaths
     //   MyApp
     // Windows:
     //   MyApp
-    public static string ExecutableFileNameWithoutExtension
-    {
-        get
-        {
+    public static string ExecutableFileNameWithoutExtension {
+        get {
             return Path.GetFileNameWithoutExtension(ExecutablePath);
         }
     }
@@ -62,10 +53,8 @@ public static class DevPaths
     //   /tmp (or wherever launched from)
     // Windows:
     //   C:\Temp
-    public static string WorkingDirectory
-    {
-        get
-        {
+    public static string WorkingDirectory {
+        get {
             return Environment.CurrentDirectory;
         }
     }
@@ -74,10 +63,8 @@ public static class DevPaths
     //   /home/soren/dev/MyApp/bin/Debug/net9.0/
     // Windows:
     //   C:\Dev\MyApp\bin\Debug\net9.0\
-    public static string StartupDirectory
-    {
-        get
-        {
+    public static string StartupDirectory {
+        get {
             return AppDomain.CurrentDomain.BaseDirectory;
         }
     }
@@ -86,10 +73,8 @@ public static class DevPaths
     //   ./MyApp --debug
     // Windows:
     //   MyApp.exe --debug
-    public static string CommandLine
-    {
-        get
-        {
+    public static string CommandLine {
+        get {
             return Environment.CommandLine;
         }
     }
@@ -102,13 +87,10 @@ public static class DevPaths
     //   /home/soren/dev/MyApp/bin/Debug/net9.0/MyApp.dll
     // Windows:
     //   C:\Dev\MyApp\bin\Debug\net9.0\MyApp.dll
-    public static string AssemblyLocation
-    {
-        get
-        {
+    public static string AssemblyLocation {
+        get {
             Assembly assembly = Assembly.GetEntryAssembly();
-            if (assembly == null)
-            {
+            if (assembly == null) {
                 return "";
             }
 
@@ -120,10 +102,8 @@ public static class DevPaths
     //   /home/soren/dev/MyApp/bin/Debug/net9.0/
     // Windows:
     //   C:\Dev\MyApp\bin\Debug\net9.0\
-    public static string AssemblyDirectory
-    {
-        get
-        {
+    public static string AssemblyDirectory {
+        get {
             return Path.GetDirectoryName(AssemblyLocation);
         }
     }
@@ -136,10 +116,8 @@ public static class DevPaths
     //   /home/soren
     // Windows:
     //   C:\Users\Soren
-    public static string UserProfile
-    {
-        get
-        {
+    public static string UserProfile {
+        get {
             return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         }
     }
@@ -148,10 +126,8 @@ public static class DevPaths
     //   /home/soren
     // Windows:
     //   C:\Users\Soren
-    public static string Home
-    {
-        get
-        {
+    public static string Home {
+        get {
             return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         }
     }
@@ -160,10 +136,8 @@ public static class DevPaths
     //   /home/soren/Desktop
     // Windows:
     //   C:\Users\Soren\Desktop
-    public static string Desktop
-    {
-        get
-        {
+    public static string Desktop {
+        get {
             return Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
         }
     }
@@ -172,10 +146,8 @@ public static class DevPaths
     //   /home/soren/Documents
     // Windows:
     //   C:\Users\Soren\Documents
-    public static string Documents
-    {
-        get
-        {
+    public static string Documents {
+        get {
             return Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         }
     }
@@ -184,10 +156,8 @@ public static class DevPaths
     //   /home/soren/Downloads
     // Windows:
     //   C:\Users\Soren\Downloads
-    public static string Downloads
-    {
-        get
-        {
+    public static string Downloads {
+        get {
             return Path.Combine(UserProfile, "Downloads");
         }
     }
@@ -196,10 +166,8 @@ public static class DevPaths
     //   /home/soren/Pictures
     // Windows:
     //   C:\Users\Soren\Pictures
-    public static string Pictures
-    {
-        get
-        {
+    public static string Pictures {
+        get {
             return Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
         }
     }
@@ -208,10 +176,8 @@ public static class DevPaths
     //   /home/soren/Music
     // Windows:
     //   C:\Users\Soren\Music
-    public static string Music
-    {
-        get
-        {
+    public static string Music {
+        get {
             return Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
         }
     }
@@ -220,10 +186,8 @@ public static class DevPaths
     //   /home/soren/Videos
     // Windows:
     //   C:\Users\Soren\Videos
-    public static string Videos
-    {
-        get
-        {
+    public static string Videos {
+        get {
             return Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
         }
     }
@@ -236,10 +200,8 @@ public static class DevPaths
     //   /home/soren/.config
     // Windows:
     //   C:\Users\Soren\AppData\Roaming
-    public static string RoamingAppData
-    {
-        get
-        {
+    public static string RoamingAppData {
+        get {
             return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         }
     }
@@ -248,10 +210,8 @@ public static class DevPaths
     //   /home/soren/.local/share
     // Windows:
     //   C:\Users\Soren\AppData\Local
-    public static string LocalAppData
-    {
-        get
-        {
+    public static string LocalAppData {
+        get {
             return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         }
     }
@@ -260,10 +220,8 @@ public static class DevPaths
     //   /usr/share
     // Windows:
     //   C:\ProgramData
-    public static string CommonApplicationData
-    {
-        get
-        {
+    public static string CommonApplicationData {
+        get {
             return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
         }
     }
@@ -276,10 +234,8 @@ public static class DevPaths
     //   /tmp
     // Windows:
     //   C:\Users\Soren\AppData\Local\Temp
-    public static string Temp
-    {
-        get
-        {
+    public static string Temp {
+        get {
             return Path.GetTempPath();
         }
     }
@@ -292,10 +248,8 @@ public static class DevPaths
     //   /usr/share/dotnet/shared/Microsoft.NETCore.App/9.0.x/
     // Windows:
     //   C:\Program Files\dotnet\shared\Microsoft.NETCore.App\9.0.x\
-    public static string RuntimeDirectory
-    {
-        get
-        {
+    public static string RuntimeDirectory {
+        get {
             return System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
         }
     }
@@ -304,10 +258,8 @@ public static class DevPaths
     //   /
     // Windows:
     //   C:\Windows\System32
-    public static string SystemDirectory
-    {
-        get
-        {
+    public static string SystemDirectory {
+        get {
             return Environment.SystemDirectory;
         }
     }
@@ -316,10 +268,8 @@ public static class DevPaths
     //   (not applicable)
     // Windows:
     //   C:\Windows
-    public static string WindowsDirectory
-    {
-        get
-        {
+    public static string WindowsDirectory {
+        get {
             return Environment.GetFolderPath(Environment.SpecialFolder.Windows);
         }
     }
@@ -332,10 +282,8 @@ public static class DevPaths
     //   kierkegaard
     // Windows:
     //   SOREN-PC
-    public static string MachineName
-    {
-        get
-        {
+    public static string MachineName {
+        get {
             return Environment.MachineName;
         }
     }
@@ -344,10 +292,8 @@ public static class DevPaths
     //   soren
     // Windows:
     //   Soren
-    public static string UserName
-    {
-        get
-        {
+    public static string UserName {
+        get {
             return Environment.UserName;
         }
     }
@@ -360,15 +306,11 @@ public static class DevPaths
     //   /home/soren/dev/MyApp/src/MyApp
     // Windows:
     //   C:\Dev\MyApp\src\MyApp
-    public static string ProjectRoot
-    {
-        get
-        {
+    public static string ProjectRoot {
+        get {
             DirectoryInfo dir = new DirectoryInfo(AppContext.BaseDirectory);
-            while (dir != null)
-            {
-                if (dir.GetFiles("*.csproj").Length > 0)
-                {
+            while (dir != null) {
+                if (dir.GetFiles("*.csproj").Length > 0) {
                     return dir.FullName;
                 }
 
@@ -379,13 +321,10 @@ public static class DevPaths
         }
     }
 
-    public static string ConfsDirectory
-    {
-        get
-        {
+    public static string ConfsDirectory {
+        get {
             string root = DevPaths.RepositoryRoot;
-            if (String.IsNullOrWhiteSpace(root))
-            {
+            if (String.IsNullOrWhiteSpace(root)) {
                 return "";
             }
 
@@ -395,13 +334,10 @@ public static class DevPaths
         }
     }
 
-    public static string LogsDirectory
-    {
-        get
-        {
+    public static string LogsDirectory {
+        get {
             string root = DevPaths.RepositoryRoot;
-            if (String.IsNullOrWhiteSpace(root))
-            {
+            if (String.IsNullOrWhiteSpace(root)) {
                 return "";
             }
 
@@ -413,14 +349,11 @@ public static class DevPaths
         }
     }
 
-    public static string DepsDirectory
-    {
-        get
-        {
+    public static string DepsDirectory {
+        get {
             string root = DevPaths.RepositoryRoot;
 
-            if (String.IsNullOrWhiteSpace(root))
-            {
+            if (String.IsNullOrWhiteSpace(root)) {
                 return "";
             }
 
@@ -434,21 +367,17 @@ public static class DevPaths
     //   /home/soren/dev/MyApp/src/MyApp/MyApp.csproj
     // Windows:
     //   C:\Dev\MyApp\src\MyApp\MyApp.csproj
-    public static string ProjectFile
-    {
-        get
-        {
+    public static string ProjectFile {
+        get {
             string root = DevPaths.ProjectRoot;
 
-            if (String.IsNullOrWhiteSpace(root))
-            {
+            if (String.IsNullOrWhiteSpace(root)) {
                 return "";
             }
 
             FileInfo file = new DirectoryInfo(root).GetFiles("*.csproj").FirstOrDefault();
 
-            if (file == null)
-            {
+            if (file == null) {
                 return "";
             }
 
@@ -464,15 +393,11 @@ public static class DevPaths
     //   /home/soren/dev/MyApp
     // Windows:
     //   C:\Dev\MyApp
-    public static string SolutionRoot
-    {
-        get
-        {
+    public static string SolutionRoot {
+        get {
             DirectoryInfo dir = new DirectoryInfo(AppContext.BaseDirectory);
-            while (dir != null)
-            {
-                if (dir.GetFiles("*.sln").Length > 0)
-                {
+            while (dir != null) {
+                if (dir.GetFiles("*.sln").Length > 0) {
                     return dir.FullName;
                 }
 
@@ -487,21 +412,17 @@ public static class DevPaths
     //   /home/soren/dev/MyApp/MyApp.sln
     // Windows:
     //   C:\Dev\MyApp\MyApp.sln
-    public static string SolutionFile
-    {
-        get
-        {
+    public static string SolutionFile {
+        get {
             string root = DevPaths.SolutionRoot;
 
-            if (String.IsNullOrWhiteSpace(root))
-            {
+            if (String.IsNullOrWhiteSpace(root)) {
                 return "";
             }
 
             FileInfo file = new DirectoryInfo(root).GetFiles("*.sln").FirstOrDefault();
 
-            if (file == null)
-            {
+            if (file == null) {
                 return "";
             }
 
@@ -518,16 +439,12 @@ public static class DevPaths
     // Windows:
     //   C:\Dev\MyApp
     // (contains .git folder)
-    public static string RepositoryRoot
-    {
-        get
-        {
+    public static string RepositoryRoot {
+        get {
             DirectoryInfo dir = new DirectoryInfo(AppContext.BaseDirectory);
 
-            while (dir != null)
-            {
-                if (Directory.Exists(Path.Combine(dir.FullName, ".git")))
-                {
+            while (dir != null) {
+                if (Directory.Exists(Path.Combine(dir.FullName, ".git"))) {
                     return dir.FullName;
                 }
 
@@ -546,10 +463,8 @@ public static class DevPaths
     //   /home/soren/.config/MyApp
     // Windows:
     //   C:\Users\Soren\AppData\Roaming\MyApp
-    public static string ConfigDirectory
-    {
-        get
-        {
+    public static string ConfigDirectory {
+        get {
             string path = Path.Combine(DevPaths.RoamingAppData, ExecutableFileNameWithoutExtension);
 
             Directory.CreateDirectory(path);
@@ -562,10 +477,8 @@ public static class DevPaths
     //   /home/soren/.config/MyApp/config.json
     // Windows:
     //   C:\Users\Soren\AppData\Roaming\MyApp\config.json
-    public static string ConfigFile
-    {
-        get
-        {
+    public static string ConfigFile {
+        get {
             return Path.Combine(DevPaths.ConfigDirectory, "config.json");
         }
     }
@@ -578,10 +491,8 @@ public static class DevPaths
     //   /home/soren/.local/share/MyApp
     // Windows:
     //   C:\Users\Soren\AppData\Local\MyApp
-    public static string DataDirectory
-    {
-        get
-        {
+    public static string DataDirectory {
+        get {
             string path = Path.Combine(DevPaths.LocalAppData, ExecutableFileNameWithoutExtension);
             Directory.CreateDirectory(path);
 
@@ -593,10 +504,8 @@ public static class DevPaths
     //   /home/soren/.local/share/MyApp/data.db
     // Windows:
     //   C:\Users\Soren\AppData\Local\MyApp\data.db
-    public static string DatabaseFile
-    {
-        get
-        {
+    public static string DatabaseFile {
+        get {
             return Path.Combine(DevPaths.DataDirectory, "data.db");
         }
     }
@@ -609,10 +518,8 @@ public static class DevPaths
     //   /home/soren/.local/share/MyApp/Logs
     // Windows:
     //   C:\Users\Soren\AppData\Local\MyApp\Logs
-    public static string LogsDirectoryLocal
-    {
-        get
-        {
+    public static string LogsDirectoryLocal {
+        get {
             string path = Path.Combine(DevPaths.DataDirectory, "Logs");
             Directory.CreateDirectory(path);
 
@@ -624,10 +531,8 @@ public static class DevPaths
     //   /home/soren/.local/share/MyApp/Logs/application.log
     // Windows:
     //   C:\Users\Soren\AppData\Local\MyApp\Logs\application.log
-    public static string LogFile
-    {
-        get
-        {
+    public static string LogFile {
+        get {
             return Path.Combine(DevPaths.LogsDirectory, "application.log");
         }
     }
@@ -636,60 +541,47 @@ public static class DevPaths
     //   /home/soren/.local/share/MyApp/Logs/application.log
     // Windows:
     //   C:\Users\Soren\AppData\Local\MyApp\Logs\application.log
-    public static string LogFileLocal
-    {
-        get
-        {
+    public static string LogFileLocal {
+        get {
             return Path.Combine(DevPaths.LogsDirectoryLocal, "application.log");
         }
     }
 
 
-    public static string SystemTemp
-    {
-        get
-        {
+    public static string SystemTemp {
+        get {
             return Path.GetTempPath();
         }
     }
 
     // Linux: /tmp (explicit)
-    public static string LinuxTmp
-    {
-        get
-        {
+    public static string LinuxTmp {
+        get {
             return "/tmp";
         }
     }
 
     // Linux: /var/tmp (persistent temp)
-    public static string LinuxVarTmp
-    {
-        get
-        {
+    public static string LinuxVarTmp {
+        get {
             return "/var/tmp";
         }
     }
 
     // Windows: %TEMP% resolved explicitly
-    public static string WindowsTemp
-    {
-        get
-        {
+    public static string WindowsTemp {
+        get {
             return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
                 + Path.DirectorySeparatorChar + "Temp";
         }
     }
 
     // Session temp (Linux XDG runtime dir)
-    public static string LinuxRuntimeTemp
-    {
-        get
-        {
+    public static string LinuxRuntimeTemp {
+        get {
             string runtime = Environment.GetEnvironmentVariable("XDG_RUNTIME_DIR");
 
-            if (!String.IsNullOrWhiteSpace(runtime))
-            {
+            if (!String.IsNullOrWhiteSpace(runtime)) {
                 return runtime;
             }
 
@@ -698,13 +590,10 @@ public static class DevPaths
     }
 
     // Generic “best available temp”
-    public static string BestTemp
-    {
-        get
-        {
+    public static string BestTemp {
+        get {
             string path = Path.GetTempPath();
-            if (!Directory.Exists(path))
-            {
+            if (!Directory.Exists(path)) {
                 return "/tmp";
             }
 
