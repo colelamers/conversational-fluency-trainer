@@ -8,7 +8,6 @@ csharp_style_var_elsewhere = false:warning
 
 # Require brackets
 csharp_prefer_braces = true:error
-
 dotnet_style_prefer_conditional_expression_over_return = false:suggestion
 dotnet_style_prefer_conditional_expression_over_assignment = false
 
@@ -27,24 +26,118 @@ csharp_space_after_dot = false
 csharp_space_before_colon_in_inheritance_clause = true
 csharp_space_before_comma = false
 csharp_space_before_dot = false
+# =========================
+# Naming Conventions
+# =========================
 
-# Newlines
-csharp_new_line_before_else = false
-csharp_new_line_before_catch = false
-csharp_new_line_before_finally = false
-csharp_new_line_before_members_in_object_initializers = false
+#### Rule 1: Private Fields -> snake_case_
+dotnet_naming_rule.private_members_should_be_snake_case_with_suffix.severity = warning
+dotnet_naming_rule.private_members_should_be_snake_case_with_suffix.symbols = private_symbols
+dotnet_naming_rule.private_members_should_be_snake_case_with_suffix.style = snake_case_with_suffix
 
-# Expression bodies
-csharp_style_expression_bodied_methods = false
-csharp_style_expression_bodied_properties = false
-csharp_style_expression_bodied_accessors = false
+# ONLY fields get the trailing underscore suffix now
+dotnet_naming_symbols.private_symbols.applicable_kinds = field
+dotnet_naming_symbols.private_symbols.applicable_accessibilities = private, internal
+dotnet_naming_style.snake_case_with_suffix.capitalization = all_lower
+dotnet_naming_style.snake_case_with_suffix.required_suffix = _
 
-# Naming
-dotnet_naming_rule.private_fields_should_be_camel_case.severity = suggestion
-dotnet_naming_rule.private_fields_should_be_camel_case.symbols = private_fields
-dotnet_naming_rule.private_fields_should_be_camel_case.style = camel_case
 
-dotnet_naming_symbols.private_fields.applicable_kinds = field
-dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+#### Rule 1b: Private Functions, Classes, & Structs -> plain snake_case (No Suffix)
+dotnet_naming_rule.private_methods_should_be_plain_snake_case.severity = warning
+dotnet_naming_rule.private_methods_should_be_plain_snake_case.symbols = private_plain_snake_symbols
+dotnet_naming_rule.private_methods_should_be_plain_snake_case.style = snake_case
 
-dotnet_naming_style.camel_case.capitalization = camel_case
+# Private classes, structs, and methods are grouped here for plain lowercase snake_case
+dotnet_naming_symbols.private_plain_snake_symbols.applicable_kinds = method, class, struct, interface, enum
+dotnet_naming_symbols.private_plain_snake_symbols.applicable_accessibilities = private, internal
+
+
+#### Rule 2: Public/Protected Members, Classes, & Structs -> PascalCase
+dotnet_naming_rule.public_members_should_be_pascal_case.severity = warning
+dotnet_naming_rule.public_members_should_be_pascal_case.symbols = public_symbols
+dotnet_naming_rule.public_members_should_be_pascal_case.style = pascal_case
+
+dotnet_naming_symbols.public_symbols.applicable_kinds = class, struct, interface, enum, property, method, event, field
+dotnet_naming_symbols.public_symbols.applicable_accessibilities = public, protected, protected_internal
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+#### Rule 3: Local variables -> snake_case
+dotnet_naming_rule.locals_should_be_snake_case.severity = warning
+dotnet_naming_rule.locals_should_be_snake_case.symbols = locals
+dotnet_naming_rule.locals_should_be_snake_case.style = snake_case
+
+dotnet_naming_symbols.locals.applicable_kinds = local
+dotnet_naming_symbols.locals.applicable_accessibilities = *
+dotnet_naming_style.snake_case.capitalization = all_lower
+
+#### Rule 4: Parameters -> snake_case
+dotnet_naming_rule.parameters_should_be_snake_case.severity = warning
+dotnet_naming_rule.parameters_should_be_snake_case.symbols = parameters
+dotnet_naming_rule.parameters_should_be_snake_case.style = snake_case
+
+dotnet_naming_symbols.parameters.applicable_kinds = parameter
+dotnet_naming_symbols.parameters.applicable_accessibilities = *
+
+# =========================
+# Expression-Bodied Members (Ban => Operators)
+# =========================
+
+# Require block bodies { } for methods and functions
+csharp_style_expression_bodied_methods = false:error
+
+# Require block bodies { } for properties and indexers
+csharp_style_expression_bodied_properties = false:error
+
+# Require block bodies { } for constructors
+csharp_style_expression_bodied_constructors = false:error
+
+# Require block bodies { } for operators
+csharp_style_expression_bodied_operators = false:error
+
+# Require block bodies { } for getters/setters/accessors
+csharp_style_expression_bodied_accessors = false:error
+
+# Require block bodies { } for local functions
+csharp_style_expression_bodied_local_functions = false:error
+
+# Require block bodies { } for finalizers/destructors
+csharp_style_expression_bodied_finalizers = false:error
+
+# Ban switch expressions
+csharp_style_prefer_switch_expression = false:error
+
+# Ban null coalescing assignment (??=)
+csharp_style_throw_expression = false:error
+
+# Ban collection expressions: [.. x]
+csharp_style_prefer_collection_expression = false:error
+csharp_style_prefer_pattern_matching = false:error
+
+#### Static readonly fields (Preprocessor Consts ie. #define ...) -> SCREAMING_SNAKE_CASE (no suffix)
+dotnet_naming_rule.static_readonly_fields_should_be_upper_snake_case.severity = warning
+dotnet_naming_rule.static_readonly_fields_should_be_upper_snake_case.symbols = static_readonly_fields
+dotnet_naming_rule.static_readonly_fields_should_be_upper_snake_case.style = upper_snake_case
+
+dotnet_naming_symbols.static_readonly_fields.applicable_kinds = field
+dotnet_naming_symbols.static_readonly_fields.applicable_accessibilities = private, internal
+dotnet_naming_symbols.static_readonly_fields.required_modifiers = static, readonly
+
+dotnet_naming_style.upper_snake_case.capitalization = all_upper
+dotnet_naming_style.upper_snake_case.word_separator = _
+
+#### Const fields -> SCREAMING_SNAKE_CASE
+dotnet_naming_rule.const_fields_should_be_upper_snake_case.severity = warning
+dotnet_naming_rule.const_fields_should_be_upper_snake_case.symbols = const_fields
+dotnet_naming_rule.const_fields_should_be_upper_snake_case.style = upper_snake_case
+
+dotnet_naming_symbols.const_fields.applicable_kinds = field
+dotnet_naming_symbols.const_fields.applicable_accessibilities = private, internal, public, protected
+dotnet_naming_symbols.const_fields.required_modifiers = const
+
+#### Enum members -> SCREAMING_SNAKE_CASE
+dotnet_naming_rule.enum_members_should_be_upper_snake_case.severity = warning
+dotnet_naming_rule.enum_members_should_be_upper_snake_case.symbols = enum_members
+dotnet_naming_rule.enum_members_should_be_upper_snake_case.style = upper_snake_case
+
+dotnet_naming_symbols.enum_members.applicable_kinds = enum_member
+dotnet_naming_symbols.enum_members.applicable_accessibilities = public, protected, internal, private

@@ -4,28 +4,30 @@ using System.Diagnostics;
 using Serilog;
 using Serilog.Context;
 using Serilog.Events;
+namespace conversational_fluency_trainer.Services;
 
 public static class AppLogger {
-    private static ILogger _logger;
-    private static readonly object _lock = new();
+    private static ILogger logger_;
+    private static readonly object lock_ = new();
 
     // =========================================================
     // INIT
     // =========================================================
     public static void Initialize(
-        string logFilePath = "logs/app.log",
-        LogEventLevel minimumLevel = LogEventLevel.Information,
+        string log_file_path = "logs/app.log",
+        LogEventLevel minimal_level = LogEventLevel.Information,
         bool console = true) {
-        lock (_lock) {
-            if (_logger != null)
+        lock (lock_) {
+            if (logger_ != null) {
                 return;
+            }
 
-            var config = new LoggerConfiguration()
-                .MinimumLevel.Is(minimumLevel)
+            LoggerConfiguration config = new LoggerConfiguration()
+                .MinimumLevel.Is(minimal_level)
                 .Enrich.FromLogContext()
                 .Enrich.WithProperty("App", AppDomain.CurrentDomain.FriendlyName)
                 .WriteTo.File(
-                    path: logFilePath,
+                    path: log_file_path,
                     rollingInterval: RollingInterval.Day,
                     shared: true);
 
@@ -35,60 +37,70 @@ public static class AppLogger {
                     "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}");
             }
 
-            _logger = config.CreateLogger();
-            Log.Logger = _logger;
+            logger_ = config.CreateLogger();
+            Log.Logger = logger_;
         }
     }
 
     // =========================================================
     // CORE LOGGING
     // =========================================================
-    public static void Debug(string message, params object[] args)
-        => _logger?.Debug(message, args);
+    public static void Debug(string message, params object[] args) {
+        logger_?.Debug(message, args);
+    }
 
-    public static void Info(string message, params object[] args)
-        => _logger?.Information(message, args);
+    public static void Info(string message, params object[] args) {
+        logger_?.Information(message, args);
+    }
 
-    public static void Warn(string message, params object[] args)
-        => _logger?.Warning(message, args);
+    public static void Warn(string message, params object[] args) {
+        logger_?.Warning(message, args);
+    }
 
-    public static void Error(string message, params object[] args)
-        => _logger?.Error(message, args);
+    public static void Error(string message, params object[] args) {
+        logger_?.Error(message, args);
+    }
 
-    public static void Fatal(string message, params object[] args)
-        => _logger?.Fatal(message, args);
+    public static void Fatal(string message, params object[] args) {
+        logger_?.Fatal(message, args);
+    }
 
     // Exception-first variants (very useful in real systems)
-    public static void Error(Exception ex, string message = "")
-        => _logger?.Error(ex, message);
+    public static void Error(Exception ex, string message = "") {
+        logger_?.Error(ex, message);
+    }
 
-    public static void Fatal(Exception ex, string message = "")
-        => _logger?.Fatal(ex, message);
+    public static void Fatal(Exception ex, string message = "") {
+        logger_?.Fatal(ex, message);
+    }
 
-    public static void Warning(Exception ex, string message = "")
-        => _logger?.Warning(ex, message);
+    public static void Warning(Exception ex, string message = "") {
+        logger_?.Warning(ex, message);
+    }
 
     // =========================================================
     // STRUCTURED LOGGING
     // =========================================================
     public static void InfoStruct(string message, Dictionary<string, object> props) {
         using (PushProperties(props)) {
-            _logger?.Information(message);
+            logger_?.Information(message);
         }
     }
 
     public static void DebugStruct(string message, Dictionary<string, object> props) {
         using (PushProperties(props)) {
-            _logger?.Debug(message);
+            logger_?.Debug(message);
         }
     }
 
     public static void ErrorStruct(string message, Dictionary<string, object> props, Exception ex = null) {
         using (PushProperties(props)) {
-            if (ex != null)
-                _logger?.Error(ex, message);
-            else
-                _logger?.Error(message);
+            if (ex != null) {
+                logger_?.Error(ex, message);
+            }
+            else {
+                logger_?.Error(message);
+            }
         }
     }
 
@@ -100,42 +112,42 @@ public static class AppLogger {
     }
 
     public static IDisposable PushProperties(Dictionary<string, object> props) {
-        var disposables = new List<IDisposable>();
+        List<IDisposable> disposables = new List<IDisposable>();
 
-        foreach (var kvp in props) {
+        foreach (KeyValuePair<string, object> kvp in props) {
             disposables.Add(LogContext.PushProperty(kvp.Key, kvp.Value));
         }
 
-        return new CompositeDisposable(disposables);
+        return new composite_disposable(disposables);
     }
 
     // =========================================================
     // TIMING / PERFORMANCE
     // =========================================================
-    public static IDisposable Time(string operationName, string category = "Timing") {
-        return new LogTimer(operationName, category);
+    public static IDisposable Time(string operation_name, string category = "Timing") {
+        return new log_timer(operation_name, category);
     }
 
-    private class LogTimer : IDisposable {
-        private readonly Stopwatch _sw;
-        private readonly string _name;
-        private readonly string _category;
+    private class log_timer : IDisposable {
+        private readonly Stopwatch sw_;
+        private readonly string name_;
+        private readonly string category_;
 
-        public LogTimer(string name, string category) {
-            _name = name;
-            _category = category;
-            _sw = Stopwatch.StartNew();
+        public log_timer(string name, string category) {
+            name_ = name;
+            category_ = category;
+            sw_ = Stopwatch.StartNew();
 
-            _logger?.Information("START {Operation} [{Category}]", _name, _category);
+            logger_?.Information("START {Operation} [{Category}]", name_, category_);
         }
 
         public void Dispose() {
-            _sw.Stop();
-            _logger?.Information(
+            sw_.Stop();
+            logger_?.Information(
                 "END {Operation} [{Category}] in {ElapsedMs} ms",
-                _name,
-                _category,
-                _sw.ElapsedMilliseconds);
+                name_,
+                category_,
+                sw_.ElapsedMilliseconds);
         }
     }
 
@@ -143,34 +155,35 @@ public static class AppLogger {
     // SPECIAL HELPERS
     // =========================================================
     public static void LogObject(string title, object obj) {
-        _logger?.Information("{Title}: {@Object}", title, obj);
+        logger_?.Information("{Title}: {@Object}", title, obj);
     }
 
-    public static void LogState(string stateName, object state) {
-        _logger?.Debug("STATE {StateName}: {@State}", stateName, state);
+    public static void LogState(string state_name, object state) {
+        logger_?.Debug("STATE {StateName}: {@State}", state_name, state);
     }
 
     public static void LogStep(string step) {
-        _logger?.Information("STEP: {Step}", step);
+        logger_?.Information("STEP: {Step}", step);
     }
 
     public static void LogTrace(string message) {
-        _logger?.Verbose(message);
+        logger_?.Verbose(message);
     }
 
     // =========================================================
     // INTERNAL DISPOSABLE COMPOSITE
     // =========================================================
-    private class CompositeDisposable : IDisposable {
-        private readonly IEnumerable<IDisposable> _items;
+    private class composite_disposable : IDisposable {
+        private readonly IEnumerable<IDisposable> items_;
 
-        public CompositeDisposable(IEnumerable<IDisposable> items) {
-            _items = items;
+        public composite_disposable(IEnumerable<IDisposable> items) {
+            items_ = items;
         }
 
         public void Dispose() {
-            foreach (var item in _items)
+            foreach (IDisposable item in items_) {
                 item.Dispose();
+            }
         }
     }
 }

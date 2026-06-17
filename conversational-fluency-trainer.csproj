@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
-    <RootNamespace>language_input_helper</RootNamespace>
+    <RootNamespace>conversational_fluency_trainer</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -15,5 +15,10 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>
-
+  
+  <ItemGroup>
+    <Using Remove="System.Linq" />
+    <Using Remove="System.Collections" />
+    <Using Remove="System.Dynamic" />
+  </ItemGroup>
 </Project>

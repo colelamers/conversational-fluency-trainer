@@ -3,11 +3,12 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Collections.Generic;
+namespace conversational_fluency_trainer.Services;
 
 public class JsonSerialization {
     private JsonNode root_;
 
-    private static readonly JsonSerializerOptions options_ = new JsonSerializerOptions {
+    private static readonly JsonSerializerOptions OPTIONS = new JsonSerializerOptions {
         PropertyNameCaseInsensitive = true,
         ReadCommentHandling = JsonCommentHandling.Skip,
         AllowTrailingCommas = true,
@@ -48,7 +49,7 @@ public class JsonSerialization {
     public T GetValue<T>(string path) {
         JsonNode node = resolve(path);
 
-        T value = node.Deserialize<T>(options_);
+        T value = node.Deserialize<T>(OPTIONS);
 
         if (value == null) {
             throw new InvalidOperationException("Conversion failed.");
@@ -116,19 +117,19 @@ public class JsonSerialization {
 
             if (node is JsonObject obj) {
                 foreach (KeyValuePair<string, JsonNode> kv in obj) {
-                    string fullKey;
+                    string full_key;
 
                     if (string.IsNullOrEmpty(prefix)) {
-                        fullKey = kv.Key;
+                        full_key = kv.Key;
                     }
                     else {
-                        fullKey = prefix + "." + kv.Key;
+                        full_key = prefix + "." + kv.Key;
                     }
 
-                    yield return fullKey;
+                    yield return full_key;
 
                     if (kv.Value != null) {
-                        stack.Push((fullKey, kv.Value));
+                        stack.Push((full_key, kv.Value));
                     }
                 }
             }

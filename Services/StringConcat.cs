@@ -1,18 +1,18 @@
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
+namespace conversational_fluency_trainer.Services;
 
 public class StringConcat {
-    static double _threshold_base = .15;
-
-    static double VERY_LOW_THRESHOLD = Math.Max(0.0, Math.Min(_threshold_base * 1, 1.0));
-    static double LOW_THRESHOLD = Math.Max(0.0, Math.Min(_threshold_base * 2, 1.0));
-    static double MED_THRESHOLD = Math.Max(0.0, Math.Min(_threshold_base * 3, 1.0));
-    static double HIGH_THRESHOLD = Math.Max(0.0, Math.Min(_threshold_base * 4, 1.0));
-    static double VERY_HIGH_THRESHOLD = Math.Max(0.0, Math.Min(_threshold_base * 5, 1.0));
-    static double SIMILARITY_THRESHOLD = .75;
-    static Regex ansi_escape = new Regex(@"\x1B\[[0-?]*[ -/]*[@-~]", RegexOptions.Compiled);
-    static HashSet<string> whisper_fill_ins_to_skip = new HashSet<string>
+    const double SIMILARITY_THRESHOLD = .75;
+    const double THRESHOLD_BASE = .15;
+    static readonly double VERY_LOW_THRESHOLD = Math.Clamp(THRESHOLD_BASE * 1, 0.0, 1.0);
+    static readonly double LOW_THRESHOLD = Math.Clamp(THRESHOLD_BASE * 2, 0.0, 1.0);
+    static readonly double MED_THRESHOLD = Math.Clamp(THRESHOLD_BASE * 3, 0.0, 1.0);
+    static readonly double HIGH_THRESHOLD = Math.Clamp(THRESHOLD_BASE * 4, 0.0, 1.0);
+    static readonly double VERY_HIGH_THRESHOLD = Math.Clamp(THRESHOLD_BASE * 5, 0.0, 1.0);
+    static Regex ansi_escape_ = new Regex(@"\x1B\[[0-?]*[ -/]*[@-~]", RegexOptions.Compiled);
+    static HashSet<string> whisper_fill_ins_to_skip_ = new HashSet<string>
     {
         "", " ", " .", " . ", " .\n", " .\x1b[2K\n",
         "(clapping)", "(explosion)", "(explosion)\x1b[2K",
@@ -31,7 +31,8 @@ public class StringConcat {
         "[", "Silence", "]"
     };
 
-    static string StripMarkdown(string reply) {
+    static string 
+    StripMarkdown(string reply) {
         reply = Regex.Replace(reply, @"\*\*(.*?)\*\*", "$1");
         reply = Regex.Replace(reply, @"\*(.*?)\*", "$1");
         reply = Regex.Replace(reply, @"__(.*?)__", "$1");
@@ -42,15 +43,16 @@ public class StringConcat {
         return reply.Trim();
     }
 
-    static string ParseForEndSentence(string reply) {
+    static string 
+    ParseForEndSentence(string reply) {
         reply = reply.Replace("> ", "").Replace("EOF by user", "").Trim();
         reply = StripMarkdown(reply);
 
-        var parts = Regex.Split(reply, @"(?<=[.?!])\s+");
-        var sentences = new StringBuilder();
+        string[] parts = Regex.Split(reply, @"(?<=[.?!])\s+");
+        StringBuilder sentences = new StringBuilder();
 
-        foreach (var p in parts) {
-            var clean = p.Trim();
+        foreach (string p in parts) {
+            string clean = p.Trim();
             if (clean.Length >= 10 && clean.Split(' ').Length >= 3 && !clean.EndsWith(":")) {
                 sentences.Append(" ").Append(clean);
                 if (sentences.ToString().Trim().Length > 200) {
@@ -62,7 +64,8 @@ public class StringConcat {
         return sentences.ToString().Trim();
     }
 
-    static void PrintOutCallResponse(string call, string response) {
+    static void 
+    PrintOutCallResponse(string call, string response) {
         Console.WriteLine("\n----------------------------------------------");
         Console.WriteLine("Speaker: " + call);
         Console.WriteLine("----------------------------------------------");
@@ -70,25 +73,36 @@ public class StringConcat {
         Console.WriteLine("----------------------------------------------");
     }
 
-    static HashSet<string> Tokenize(List<string> words) {
-        var text = string.Join(" ", words).ToLower();
+    public static HashSet<string> 
+    Tokenize(List<string> words) {
+        string text = string.Join(" ", words).ToLower();
         text = Regex.Replace(text, @"[^\w\s]", "");
-        return text.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToHashSet();
+        return new HashSet<string>(
+            text.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        );
     }
 
-    static double JaccardSimilarity(List<string> a, List<string> b) {
-        var set1 = Tokenize(a);
-        var set2 = Tokenize(b);
+    public static double 
+    JaccardSimilarity(List<string> a, List<string> b) {
+        HashSet<string> set1 = Tokenize(a);
+        HashSet<string> set2 = Tokenize(b);
 
-        var inter = set1.Intersect(set2).Count();
-        var union = set1.Union(set2).Count();
+        HashSet<string> inter_set = new HashSet<string>(set1);
+        inter_set.IntersectWith(set2);
+
+        HashSet<string> union_set = new HashSet<string>(set1);
+        union_set.UnionWith(set2);
+
+        int inter = inter_set.Count;
+        int union = union_set.Count;
 
         return union == 0 ? 0.0 : (double)inter / union;
     }
 
-    static double CosineSimilarity(List<string> a, List<string> b) {
-        var set1 = Tokenize(a);
-        var set2 = Tokenize(b);
+    public static double 
+    CosineSimilarity(List<string> a, List<string> b) {
+        HashSet<string> set1 = Tokenize(a);
+        HashSet<string> set2 = Tokenize(b);
         int inter = 0;
         foreach (string item in set1) {
             if (set2.Contains(item)) {
@@ -100,79 +114,101 @@ public class StringConcat {
             ? 0.0 : (double)inter / Math.Sqrt(set1.Count * set2.Count);
     }
 
-    static double DiceCoefficient(List<string> a, List<string> b) {
-        var set1 = Tokenize(a);
-        var set2 = Tokenize(b);
+    public static double 
+    DiceCoefficient(List<string> a, List<string> b) {
+        HashSet<string> set1 = Tokenize(a);
+        HashSet<string> set2 = Tokenize(b);
         int inter = 0;
         foreach (string item in set1) {
             if (set2.Contains(item)) {
                 inter++;
             }
         }
-        var total = set1.Count + set2.Count;
+        int total = set1.Count + set2.Count;
 
         return total == 0 ? 0.0 : (2.0 * inter) / total;
     }
 
-    static double RougeL(List<string> a, List<string> b) {
-        int rowCount = a.Count;
-        int columnCount = b.Count;
+    public static double 
+    RougeL(List<string> a, List<string> b) {
+        int row_count = a.Count;
+        int column_count = b.Count;
 
         // Explicitly allocating an array of arrays (jagged array)
-        int[][] longestCommonSubsequenceTable = new int[rowCount + 1][];
-        for (int i = 0; i <= rowCount; i++) {
-            longestCommonSubsequenceTable[i] = new int[columnCount + 1];
+        // Longest Common Subsequence Table
+        int[][] lcst = new int[row_count + 1][];
+        for (int i = 0; i <= row_count; i++) {
+            lcst[i] = new int[column_count + 1];
         }
 
-        for (int row = 0; row < rowCount; row++) {
-            for (int column = 0; column < columnCount; column++) {
-                int currentRow = row + 1;
-                int currentColumn = column + 1;
+        for (int row = 0; row < row_count; row++) {
+            for (int column = 0; column < column_count; column++) {
+                int current_row = row + 1;
+                int current_column = column + 1;
 
-                string leftToken = a[row].ToLower();
-                string rightToken = b[column].ToLower();
+                string left_token = a[row].ToLower();
+                string right_token = b[column].ToLower();
 
-                if (leftToken == rightToken) {
+                if (left_token == right_token) {
                     // Explicitly grabbing from the previous row and previous column
-                    int diagonalValue = longestCommonSubsequenceTable[row][column];
-                    longestCommonSubsequenceTable[currentRow][currentColumn] = diagonalValue + 1;
+                    int diagonal_value = lcst[row][column];
+                    lcst[current_row][current_column] = diagonal_value + 1;
                 }
                 else {
                     // Explicitly comparing the cell directly above and the cell to the exact left
-                    int valueAbove = longestCommonSubsequenceTable[row][currentColumn];
-                    int valueToLeft = longestCommonSubsequenceTable[currentRow][column];
-                    longestCommonSubsequenceTable[currentRow][currentColumn] = Math.Max(valueAbove, valueToLeft);
+                    lcst[current_row][current_column] = Math.Max(
+                        lcst[row][current_column], lcst[current_row][column]);
                 }
             }
         }
 
-        int longestCommonSubsequenceLength = longestCommonSubsequenceTable[rowCount][columnCount];
+        int len_lcst = lcst[row_count][column_count];
 
-        double precision = longestCommonSubsequenceLength / (double)Math.Max(1, columnCount);
-        double recall = longestCommonSubsequenceLength / (double)Math.Max(1, rowCount);
-        double precisionPlusRecall = precision + recall;
+        double precision = len_lcst / (double)Math.Max(1, column_count);
+        double recall = len_lcst / (double)Math.Max(1, row_count);
+        double precision_plus_recall = precision + recall;
 
-        if (precisionPlusRecall == 0) {
+        if (precision_plus_recall == 0) {
             return 0.0;
         }
 
-        return (2.0 * precision * recall) / precisionPlusRecall;
+        return (2.0 * precision * recall) / precision_plus_recall;
     }
 
-    static double SlidingWindowComparison(List<string> prev, List<string> cur, bool isJaccard) {
+    static double 
+    SlidingWindowComparison(List<string> prev, List<string> cur, bool is_jaccard) {
         if (prev.Count == 0 && cur.Count == 0) {
             return 0;
         }
 
-        int prevWin = prev.Count > 1 ? Math.Min(4, prev.Count) : 1;
-        int curWin = cur.Count > 1 ? Math.Min(4, cur.Count) : 1;
+        int prev_win;
+        if (prev.Count > 1) {
+            prev_win = Math.Min(4, prev.Count);
+        }
+        else {
+            prev_win = 1;
+        }
+
+        int cur_win;
+        if (cur.Count > 1) {
+            cur_win = Math.Min(4, cur.Count);
+        }
+        else {
+            cur_win = 1;
+        }
+
         int matches = 0;
 
-        for (int i = 0; i <= prev.Count - prevWin; i++) {
-            for (int j = 0; j <= cur.Count - curWin; j++) {
-                double sim = isJaccard
-                    ? JaccardSimilarity(prev.GetRange(i, prevWin), cur.GetRange(j, curWin))
-                    : CosineSimilarity(prev.GetRange(i, prevWin), cur.GetRange(j, curWin));
+        for (int i = 0; i <= prev.Count - prev_win; i++) {
+            for (int j = 0; j <= cur.Count - cur_win; j++) {
+                double sim;
+
+                if (is_jaccard) {
+                    sim = JaccardSimilarity(prev.GetRange(i, prev_win), cur.GetRange(j, cur_win));
+                }
+                else {
+                    sim = CosineSimilarity(prev.GetRange(i, prev_win), cur.GetRange(j, cur_win));
+                }
 
                 if (sim >= SIMILARITY_THRESHOLD) {
                     matches++;
@@ -181,25 +217,45 @@ public class StringConcat {
             }
         }
 
-        return matches / (double)Math.Max(1, prev.Count - prevWin + 1);
+        double denominator = Math.Max(1, prev.Count - prev_win + 1);
+        return matches / denominator;
     }
 
     // todo; can revise this to not be "is jaccard"
-    static double SlidingWindowComparisonWindow(List<string> prev, List<string> cur, bool isJaccard) {
-        if (prev.Count == 0 && cur.Count == 0) { 
+    static double 
+    SlidingWindowComparisonWindow(List<string> prev, List<string> cur, bool isJaccard) {
+        if (prev.Count == 0 && cur.Count == 0) {
             return 0;
         }
 
-        int prevWin = prev.Count > 1 ? Math.Min(4, prev.Count) : 1;
-        int curWin = cur.Count > 1 ? Math.Min(4, cur.Count) : 1;
+        int prev_win;
+        if (prev.Count > 1) {
+            prev_win = Math.Min(4, prev.Count);
+        }
+        else {
+            prev_win = 1;
+        }
+
+        int cur_win;
+        if (cur.Count > 1) {
+            cur_win = Math.Min(4, cur.Count);
+        }
+        else {
+            cur_win = 1;
+        }
+
         int matches = 0;
 
-        for (int i = 0; i <= prev.Count - prevWin; i++) {
-            for (int j = 0; j <= cur.Count - curWin; j++) {
-                // Pass the original lists, the starting index, and the window size explicitly
-                double sim = isJaccard
-                    ? JaccardSimilarityWindow(prev, i, prevWin, cur, j, curWin)
-                    : CosineSimilarityWindow(prev, i, prevWin, cur, j, curWin);
+        for (int i = 0; i <= prev.Count - prev_win; i++) {
+            for (int j = 0; j <= cur.Count - cur_win; j++) {
+                double sim;
+
+                if (isJaccard) {
+                    sim = JaccardSimilarityWindow(prev, i, prev_win, cur, j, cur_win);
+                }
+                else {
+                    sim = CosineSimilarityWindow(prev, i, prev_win, cur, j, cur_win);
+                }
 
                 if (sim >= SIMILARITY_THRESHOLD) {
                     matches++;
@@ -208,23 +264,29 @@ public class StringConcat {
             }
         }
 
-        return matches / (double)Math.Max(1, prev.Count - prevWin + 1);
+        double denominator = Math.Max(1, prev.Count - prev_win + 1);
+        return matches / denominator;
     }
 
-    static HashSet<string> TokenizeWindow(List<string> words, int offset, int length) {
+    static HashSet<string> 
+    TokenizeWindow(List<string> words, int offset, int length) {
         // Explicitly building the string loop only from the specified window range
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         for (int i = offset; i < offset + length; i++) {
             sb.Append(words[i]).Append(" ");
         }
-        var text = sb.ToString().ToLower();
+        string text = sb.ToString().ToLower();
         text = Regex.Replace(text, @"[^\w\s]", "");
-        return text.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToHashSet();
+        return new HashSet<string>(
+            text.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        );
     }
 
-    static double JaccardSimilarityWindow(List<string> a, int aOffset, int aLen, List<string> b, int bOffset, int bLen) {
-        var set1 = TokenizeWindow(a, aOffset, aLen);
-        var set2 = TokenizeWindow(b, bOffset, bLen);
+    static double 
+    JaccardSimilarityWindow(List<string> a, int a_offset, int a_len, 
+                            List<string> b, int b_offset, int b_len) {
+        HashSet<string> set1 = TokenizeWindow(a, a_offset, a_len);
+        HashSet<string> set2 = TokenizeWindow(b, b_offset, b_len);
 
         // Explicit manual intersection loop to avoid LINQ deferred execution magic
         int inter = 0;
@@ -238,9 +300,11 @@ public class StringConcat {
         return union == 0 ? 0.0 : (double)inter / union;
     }
 
-    static double CosineSimilarityWindow(List<string> a, int aOffset, int aLen, List<string> b, int bOffset, int bLen) {
-        var set1 = TokenizeWindow(a, aOffset, aLen);
-        var set2 = TokenizeWindow(b, bOffset, bLen);
+    static double 
+    CosineSimilarityWindow(List<string> a, int a_offset, int a_len, 
+                           List<string> b, int b_offset, int b_len) {
+        HashSet<string> set1 = TokenizeWindow(a, a_offset, a_len);
+        HashSet<string> set2 = TokenizeWindow(b, b_offset, b_len);
 
         int inter = 0;
         foreach (string item in set1) {
@@ -249,39 +313,43 @@ public class StringConcat {
             }
         }
 
-        return (set1.Count == 0 || set2.Count == 0)
-            ? 0.0
-            : (double)inter / Math.Sqrt(set1.Count * set2.Count);
+        if (set1.Count == 0 || set2.Count == 0) {
+            return 0.0;
+        }
+
+        return (double)inter / Math.Sqrt(set1.Count * set2.Count);
     }
 
 
-    static List<string> WhisperReadLine(Process whisperProc, ref List<string> prevSentence, List<string> concatList) {
-        var line = whisperProc.StandardOutput.ReadLine();
+    static List<string>
+    WhisperReadLine(Process whisperProc, ref List<string> prev_sentence, List<string> concat_list) {
+        string? line = whisperProc.StandardOutput.ReadLine();
         if (line == null) {
             return new List<string>();
         }
 
-        var clean = ansi_escape.Replace(line, "").Trim();
-        var newSentence = clean.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
-
-        if (newSentence.Count <= 1) {
-            return new List<string>();
-        }
-        if (whisper_fill_ins_to_skip.Contains(clean)) {
+        string clean = ansi_escape_.Replace(line, "").Trim();
+        List<string> new_sentence = new List<string>(
+            clean.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        );
+        if (new_sentence.Count <= 1) {
             return new List<string>();
         }
 
-        // double jaccard = SlidingWindowComparison(prevSentence, newSentence, true);
-        // double cosine = SlidingWindowComparison(prevSentence, newSentence, false);
+        if (whisper_fill_ins_to_skip_.Contains(clean)) {
+            return new List<string>();
+        }
+
+        // double jaccard = SlidingWindowComparison(prev_sentence, newSentence, true);
+        // double cosine = SlidingWindowComparison(prev_sentence, newSentence, false);
         // NOTE: These eliminate the need for some linq
-        double jaccard = SlidingWindowComparisonWindow(prevSentence, newSentence, true);
-        double cosine = SlidingWindowComparisonWindow(prevSentence, newSentence, false);
+        double jaccard = SlidingWindowComparisonWindow(prev_sentence, new_sentence, true);
+        double cosine = SlidingWindowComparisonWindow(prev_sentence, new_sentence, false);
 
-        double dice = DiceCoefficient(prevSentence, newSentence);
-        double rouge = RougeL(prevSentence, newSentence);
-
-        bool matchData = prevSentence.Count > 0 && newSentence.Count > 0;
-
+        double dice = DiceCoefficient(prev_sentence, new_sentence);
+        double rouge = RougeL(prev_sentence, new_sentence);
+        // todo; revise all these bools
+        bool match_data = prev_sentence.Count > 0 && new_sentence.Count > 0;
         bool overwrite =
             jaccard > HIGH_THRESHOLD &&
             cosine > VERY_HIGH_THRESHOLD &&
@@ -294,30 +362,37 @@ public class StringConcat {
             dice > LOW_THRESHOLD &&
             rouge > LOW_THRESHOLD;
 
-        bool lastWordMatch = prevSentence.Count > 0 && prevSentence[prevSentence.Count - 1] == newSentence[0];
+        // todo; revise this
+        bool last_word_match = prev_sentence.Count > 0 && prev_sentence[prev_sentence.Count - 1] == new_sentence[0];
 
-        int iIndex = concatList.Count - prevSentence.Count;
+        int idx = concat_list.Count - prev_sentence.Count;
 
-        if (!matchData) {
-            concatList.AddRange(newSentence);
+        if (!match_data) {
+            // todo; i heavily dislike this linq
+            concat_list.AddRange(new_sentence);
         }
         else if (overwrite) {
-            concatList = concatList.Take(iIndex).Concat(newSentence).ToList();
+            concat_list.RemoveRange(idx, concat_list.Count - idx);
+            concat_list.AddRange(new_sentence);
         }
         else if (append) {
-            concatList.AddRange(newSentence);
+            // todo; i heavily dislike this linq
+            concat_list.AddRange(new_sentence);
         }
-        else if (lastWordMatch) {
-            concatList = concatList.Take(iIndex)
-                .Concat(prevSentence.Take(prevSentence.Count - 1))
-                .Concat(newSentence)
-                .ToList();
+        else if (last_word_match) {
+            concat_list.RemoveRange(idx, concat_list.Count - idx);
+            for (int i = 0; i < prev_sentence.Count - 1; i++) {
+                concat_list.Add(prev_sentence[i]);
+            }
+
+            concat_list.AddRange(new_sentence);
         }
         else {
-            concatList.AddRange(newSentence);
+            // todo; i heavily dislike this linq
+            concat_list.AddRange(new_sentence);
         }
 
-        prevSentence = newSentence;
-        return newSentence;
+        prev_sentence = new_sentence;
+        return new_sentence;
     }
 }
