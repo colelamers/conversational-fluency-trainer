@@ -7,8 +7,8 @@ namespace conversational_fluency_trainer.Services;
 public class WhisperRunner {
     Process process_;
 
-    string whisper_path_ = Path.Combine(DevPaths.ProjectRoot, "dependencies/whisper-stream");
-    string model_path_ = Path.Combine(DevPaths.ProjectRoot, "dependencies/ggml-large-v3-turbo-q5_0.bin");
+    string whisper_path_ = Path.Combine(workspace.Paths.ProjectRoot, "dependencies/whisper-stream");
+    string model_path_ = Path.Combine(workspace.Paths.ProjectRoot, "dependencies/ggml-large-v3-turbo-q5_0.bin");
 
     public async Task RunAsync() {
         ProcessStartInfo psi = new () {
