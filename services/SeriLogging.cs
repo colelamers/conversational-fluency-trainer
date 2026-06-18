@@ -1,44 +1,44 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using Serilog;
 using Serilog.Context;
 using Serilog.Events;
-namespace conversational_fluency_trainer.Services;
+
+namespace conversational_fluency_trainer.services;
 
 public static class AppLogger {
-    private static ILogger logger_;
-    private static readonly object lock_ = new();
+    private static ILogger? logger_;
+    private static readonly object LOCK = new();
 
     // =========================================================
     // INIT
     // =========================================================
     public static void Initialize(
-        string log_file_path = "logs/app.log",
-        LogEventLevel minimal_level = LogEventLevel.Information,
-        bool console = true) {
-        lock (lock_) {
+        LogEventLevel min_level = LogEventLevel.Information, 
+        bool console = true) 
+    {
+        lock (LOCK) {
             if (logger_ != null) {
                 return;
             }
 
             LoggerConfiguration config = new LoggerConfiguration()
-                .MinimumLevel.Is(minimal_level)
+                .MinimumLevel.Is(min_level)
                 .Enrich.FromLogContext()
                 .Enrich.WithProperty("App", AppDomain.CurrentDomain.FriendlyName)
                 .WriteTo.File(
-                    path: log_file_path,
+                    path: "logs/app.log",
                     rollingInterval: RollingInterval.Day,
                     shared: true);
 
             if (console) {
                 config = config.WriteTo.Console(
                     outputTemplate:
-                    "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}");
+                    "[{Timestamp:HH:mm:ss} {Level:u3}] " +
+                    "{Message:lj} {Properties:j}{NewLine}{Exception}");
             }
 
-            logger_ = config.CreateLogger();
-            Log.Logger = logger_;
+            Log.Logger = config.CreateLogger();
+            logger_ = Log.Logger;
         }
     }
 

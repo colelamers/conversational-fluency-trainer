@@ -1,18 +1,18 @@
 public class AppConfigModel {
-    public string AppName { get; set; }
-    public string LogLevel { get; set; }
+    public string? AppName { get; set; }
+    public string? LogLevel { get; set; }
     public int MaxThreads { get; set; }
-    public AudioConfig Audio { get; set; }
+    public AudioConfig? Audio { get; set; }
 }
 
 public class AudioConfig {
     public int DeviceIndex { get; set; }
     public int SampleRate { get; set; }
-    public ComplexThingConfig ComplexThing { get; set; }
+    public ComplexThingConfig? ComplexThing { get; set; }
 }
 
 public class ComplexThingConfig {
-    public AConfig A { get; set; }
+    public AConfig? A { get; set; }
 }
 
 public class AConfig {

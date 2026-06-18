@@ -1,5 +1,5 @@
 using System.Reflection;
-namespace workspace;
+namespace core.infra;
 public static class Paths {
     // --------------------------------------------------------------------
     // EXECUTABLE
@@ -102,7 +102,7 @@ public static class Paths {
     public static string 
     AssemblyLocation {
         get {
-            Assembly assembly = Assembly.GetEntryAssembly();
+            Assembly? assembly = Assembly.GetEntryAssembly();
             if (assembly == null) {
                 return "";
             }
@@ -115,7 +115,7 @@ public static class Paths {
     //   /home/soren/dev/MyApp/bin/Debug/net9.0/
     // Windows:
     //   C:\Dev\MyApp\bin\Debug\net9.0\
-    public static string 
+    public static string?
     AssemblyDirectory {
         get {
             return Path.GetDirectoryName(AssemblyLocation);
@@ -340,7 +340,7 @@ public static class Paths {
     public static string 
     ProjectRoot {
         get {
-            DirectoryInfo dir = new DirectoryInfo(AppContext.BaseDirectory);
+            DirectoryInfo? dir = new DirectoryInfo(AppContext.BaseDirectory);
             while (dir != null) {
                 if (dir.GetFiles("*.csproj").Length > 0) {
                     return dir.FullName;
@@ -356,7 +356,7 @@ public static class Paths {
     public static string 
     ConfsDirectory {
         get {
-            string root = workspace.Paths.RepositoryRoot;
+            string root = core.infra.Paths.RepositoryRoot;
             if (String.IsNullOrWhiteSpace(root)) {
                 return "";
             }
@@ -369,7 +369,7 @@ public static class Paths {
     public static string 
     LogsDirectory {
         get {
-            string root = workspace.Paths.RepositoryRoot;
+            string root = core.infra.Paths.RepositoryRoot;
             if (String.IsNullOrWhiteSpace(root)) {
                 return "";
             }
@@ -383,7 +383,7 @@ public static class Paths {
     public static string
     DepsDirectory {
         get {
-            string root = workspace.Paths.RepositoryRoot;
+            string root = core.infra.Paths.RepositoryRoot;
             if (String.IsNullOrWhiteSpace(root)) {
                 return "";
             }
@@ -400,7 +400,7 @@ public static class Paths {
     public static string 
     ProjectFile {
         get {
-            string root = workspace.Paths.ProjectRoot;
+            string root = core.infra.Paths.ProjectRoot;
             if (String.IsNullOrWhiteSpace(root)) {
                 return "";
             }
@@ -425,7 +425,7 @@ public static class Paths {
     public static string 
     SolutionRoot {
         get {
-            DirectoryInfo dir = new DirectoryInfo(AppContext.BaseDirectory);
+            DirectoryInfo? dir = new DirectoryInfo(AppContext.BaseDirectory);
             while (dir != null) {
                 if (dir.GetFiles("*.sln").Length > 0) {
                     return dir.FullName;
@@ -445,7 +445,7 @@ public static class Paths {
     public static string 
     SolutionFile {
         get {
-            string root = workspace.Paths.SolutionRoot;
+            string root = core.infra.Paths.SolutionRoot;
             if (String.IsNullOrWhiteSpace(root)) {
                 return "";
             }
@@ -471,7 +471,7 @@ public static class Paths {
     public static string 
     RepositoryRoot {
         get {
-            DirectoryInfo dir = new DirectoryInfo(AppContext.BaseDirectory);
+            DirectoryInfo? dir = new DirectoryInfo(AppContext.BaseDirectory);
             while (dir != null) {
                 if (Directory.Exists(Path.Combine(dir.FullName, ".git"))) {
                     return dir.FullName;
@@ -495,7 +495,7 @@ public static class Paths {
     public static string 
     ConfigDirectory {
         get {
-            string path = Path.Combine(workspace.Paths.RoamingAppData, ExecutableFileNameWithoutExtension);
+            string path = Path.Combine(core.infra.Paths.RoamingAppData, ExecutableFileNameWithoutExtension);
             Directory.CreateDirectory(path);
             return path;
         }
@@ -508,7 +508,7 @@ public static class Paths {
     public static string 
     ConfigFile {
         get {
-            return Path.Combine(workspace.Paths.ConfigDirectory, "config.json");
+            return Path.Combine(core.infra.Paths.ConfigDirectory, "config.json");
         }
     }
 
@@ -523,7 +523,7 @@ public static class Paths {
     public static string 
     DataDirectory {
         get {
-            string path = Path.Combine(workspace.Paths.LocalAppData, ExecutableFileNameWithoutExtension);
+            string path = Path.Combine(core.infra.Paths.LocalAppData, ExecutableFileNameWithoutExtension);
             Directory.CreateDirectory(path);
             return path;
         }
@@ -536,7 +536,7 @@ public static class Paths {
     public static string 
     DatabaseFile {
         get {
-            return Path.Combine(workspace.Paths.DataDirectory, "data.db");
+            return Path.Combine(core.infra.Paths.DataDirectory, "data.db");
         }
     }
 
@@ -551,7 +551,7 @@ public static class Paths {
     public static string 
     LogsDirectoryLocal {
         get {
-            string path = Path.Combine(workspace.Paths.DataDirectory, "Logs");
+            string path = Path.Combine(core.infra.Paths.DataDirectory, "Logs");
             Directory.CreateDirectory(path);
             return path;
         }
@@ -564,7 +564,7 @@ public static class Paths {
     public static string 
     LogFile {
         get {
-            return Path.Combine(workspace.Paths.LogsDirectory, "application.log");
+            return Path.Combine(core.infra.Paths.LogsDirectory, "application.log");
         }
     }
 
@@ -575,7 +575,7 @@ public static class Paths {
     public static string 
     LogFileLocal {
         get {
-            return Path.Combine(workspace.Paths.LogsDirectoryLocal, "application.log");
+            return Path.Combine(core.infra.Paths.LogsDirectoryLocal, "application.log");
         }
     }
 
@@ -616,7 +616,7 @@ public static class Paths {
     public static string 
     LinuxRuntimeTemp {
         get {
-            string runtime = Environment.GetEnvironmentVariable("XDG_RUNTIME_DIR");
+            string? runtime = Environment.GetEnvironmentVariable("XDG_RUNTIME_DIR");
             if (!String.IsNullOrWhiteSpace(runtime)) {
                 return runtime;
             }

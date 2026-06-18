@@ -3,7 +3,7 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Collections.Generic;
-namespace conversational_fluency_trainer.Services;
+namespace conversational_fluency_trainer.services;
 
 public class JsonSerialization {
     private JsonNode root_;

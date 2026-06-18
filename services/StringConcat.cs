@@ -1,9 +1,34 @@
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
-namespace conversational_fluency_trainer.Services;
+using core.algs;
+namespace conversational_fluency_trainer.services;
 
 public class StringConcat {
+    /*
+        // todo 1; implement this cache at some point to speed up the redundant
+        // iterations
+
+        readonly struct TokenWindow
+        {
+            public int StartIndex { get; init; }
+            public int WordCount { get; init; }
+
+            public TokenWindow(int startIndex, int wordCount)
+            {
+                StartIndex = startIndex;
+                WordCount = wordCount;
+            }
+        }
+
+        Then:
+
+        Dictionary<TokenWindow, HashSet<string>> cache = new();
+
+        When you read:
+
+        cache[new TokenWindow(5, 4)];
+    */
     const double SIMILARITY_THRESHOLD = .75;
     const double THRESHOLD_BASE = .15;
     static readonly double VERY_LOW_THRESHOLD = Math.Clamp(THRESHOLD_BASE * 1, 0.0, 1.0);
@@ -73,107 +98,6 @@ public class StringConcat {
         Console.WriteLine("----------------------------------------------");
     }
 
-    public static HashSet<string> 
-    Tokenize(List<string> words) {
-        string text = string.Join(" ", words).ToLower();
-        text = Regex.Replace(text, @"[^\w\s]", "");
-        return new HashSet<string>(
-            text.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-        );
-    }
-
-    public static double 
-    JaccardSimilarity(List<string> a, List<string> b) {
-        HashSet<string> set1 = Tokenize(a);
-        HashSet<string> set2 = Tokenize(b);
-
-        HashSet<string> inter_set = new HashSet<string>(set1);
-        inter_set.IntersectWith(set2);
-
-        HashSet<string> union_set = new HashSet<string>(set1);
-        union_set.UnionWith(set2);
-
-        int inter = inter_set.Count;
-        int union = union_set.Count;
-
-        return union == 0 ? 0.0 : (double)inter / union;
-    }
-
-    public static double 
-    CosineSimilarity(List<string> a, List<string> b) {
-        HashSet<string> set1 = Tokenize(a);
-        HashSet<string> set2 = Tokenize(b);
-        int inter = 0;
-        foreach (string item in set1) {
-            if (set2.Contains(item)) {
-                inter++;
-            }
-        }
-
-        return (set1.Count == 0 || set2.Count == 0)
-            ? 0.0 : (double)inter / Math.Sqrt(set1.Count * set2.Count);
-    }
-
-    public static double 
-    DiceCoefficient(List<string> a, List<string> b) {
-        HashSet<string> set1 = Tokenize(a);
-        HashSet<string> set2 = Tokenize(b);
-        int inter = 0;
-        foreach (string item in set1) {
-            if (set2.Contains(item)) {
-                inter++;
-            }
-        }
-        int total = set1.Count + set2.Count;
-
-        return total == 0 ? 0.0 : (2.0 * inter) / total;
-    }
-
-    public static double 
-    RougeL(List<string> a, List<string> b) {
-        int row_count = a.Count;
-        int column_count = b.Count;
-
-        // Explicitly allocating an array of arrays (jagged array)
-        // Longest Common Subsequence Table
-        int[][] lcst = new int[row_count + 1][];
-        for (int i = 0; i <= row_count; i++) {
-            lcst[i] = new int[column_count + 1];
-        }
-
-        for (int row = 0; row < row_count; row++) {
-            for (int column = 0; column < column_count; column++) {
-                int current_row = row + 1;
-                int current_column = column + 1;
-
-                string left_token = a[row].ToLower();
-                string right_token = b[column].ToLower();
-
-                if (left_token == right_token) {
-                    // Explicitly grabbing from the previous row and previous column
-                    int diagonal_value = lcst[row][column];
-                    lcst[current_row][current_column] = diagonal_value + 1;
-                }
-                else {
-                    // Explicitly comparing the cell directly above and the cell to the exact left
-                    lcst[current_row][current_column] = Math.Max(
-                        lcst[row][current_column], lcst[current_row][column]);
-                }
-            }
-        }
-
-        int len_lcst = lcst[row_count][column_count];
-
-        double precision = len_lcst / (double)Math.Max(1, column_count);
-        double recall = len_lcst / (double)Math.Max(1, row_count);
-        double precision_plus_recall = precision + recall;
-
-        if (precision_plus_recall == 0) {
-            return 0.0;
-        }
-
-        return (2.0 * precision * recall) / precision_plus_recall;
-    }
 
     static double 
     SlidingWindowComparison(List<string> prev, List<string> cur, bool is_jaccard) {
@@ -204,10 +128,10 @@ public class StringConcat {
                 double sim;
 
                 if (is_jaccard) {
-                    sim = JaccardSimilarity(prev.GetRange(i, prev_win), cur.GetRange(j, cur_win));
+                    sim = SimilarityMetrics.JaccardSimilarity(prev.GetRange(i, prev_win), cur.GetRange(j, cur_win));
                 }
                 else {
-                    sim = CosineSimilarity(prev.GetRange(i, prev_win), cur.GetRange(j, cur_win));
+                    sim = SimilarityMetrics.CosineSimilarity(prev.GetRange(i, prev_win), cur.GetRange(j, cur_win));
                 }
 
                 if (sim >= SIMILARITY_THRESHOLD) {
@@ -251,10 +175,10 @@ public class StringConcat {
                 double sim;
 
                 if (isJaccard) {
-                    sim = JaccardSimilarityWindow(prev, i, prev_win, cur, j, cur_win);
+                    sim = SimilarityMetrics.JaccardSimilarityWindow(prev, i, prev_win, cur, j, cur_win);
                 }
                 else {
-                    sim = CosineSimilarityWindow(prev, i, prev_win, cur, j, cur_win);
+                    sim = SimilarityMetrics.CosineSimilarityWindow(prev, i, prev_win, cur, j, cur_win);
                 }
 
                 if (sim >= SIMILARITY_THRESHOLD) {
@@ -268,69 +192,19 @@ public class StringConcat {
         return matches / denominator;
     }
 
-    static HashSet<string> 
-    TokenizeWindow(List<string> words, int offset, int length) {
-        // Explicitly building the string loop only from the specified window range
-        StringBuilder sb = new StringBuilder();
-        for (int i = offset; i < offset + length; i++) {
-            sb.Append(words[i]).Append(" ");
-        }
-        string text = sb.ToString().ToLower();
-        text = Regex.Replace(text, @"[^\w\s]", "");
-        return new HashSet<string>(
-            text.Split(' ', StringSplitOptions.RemoveEmptyEntries)
-        );
-    }
 
-    static double 
-    JaccardSimilarityWindow(List<string> a, int a_offset, int a_len, 
-                            List<string> b, int b_offset, int b_len) {
-        HashSet<string> set1 = TokenizeWindow(a, a_offset, a_len);
-        HashSet<string> set2 = TokenizeWindow(b, b_offset, b_len);
-
-        // Explicit manual intersection loop to avoid LINQ deferred execution magic
-        int inter = 0;
-        foreach (string item in set1) {
-            if (set2.Contains(item)) {
-                inter++;
-            }
-        }
-
-        int union = set1.Count + set2.Count - inter;
-        return union == 0 ? 0.0 : (double)inter / union;
-    }
-
-    static double 
-    CosineSimilarityWindow(List<string> a, int a_offset, int a_len, 
-                           List<string> b, int b_offset, int b_len) {
-        HashSet<string> set1 = TokenizeWindow(a, a_offset, a_len);
-        HashSet<string> set2 = TokenizeWindow(b, b_offset, b_len);
-
-        int inter = 0;
-        foreach (string item in set1) {
-            if (set2.Contains(item)) {
-                inter++;
-            }
-        }
-
-        if (set1.Count == 0 || set2.Count == 0) {
-            return 0.0;
-        }
-
-        return (double)inter / Math.Sqrt(set1.Count * set2.Count);
-    }
 
 
     static List<string>
-    WhisperReadLine(Process whisperProc, ref List<string> prev_sentence, List<string> concat_list) {
+    WhisperReadLine(Process whisperProc, ref List<string> prev_sentence, List<string> concat_list) 
+    {
         string? line = whisperProc.StandardOutput.ReadLine();
         if (line == null) {
             return new List<string>();
         }
 
         string clean = ansi_escape_.Replace(line, "").Trim();
-        List<string> new_sentence = new List<string>(
-            clean.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        List<string> new_sentence = new(clean.Split(' ', StringSplitOptions.RemoveEmptyEntries)
         );
         if (new_sentence.Count <= 1) {
             return new List<string>();
@@ -345,9 +219,8 @@ public class StringConcat {
         // NOTE: These eliminate the need for some linq
         double jaccard = SlidingWindowComparisonWindow(prev_sentence, new_sentence, true);
         double cosine = SlidingWindowComparisonWindow(prev_sentence, new_sentence, false);
-
-        double dice = DiceCoefficient(prev_sentence, new_sentence);
-        double rouge = RougeL(prev_sentence, new_sentence);
+        double dice = SimilarityMetrics.DiceCoefficient(prev_sentence, new_sentence);
+        double rouge = SimilarityMetrics.RougeL(prev_sentence, new_sentence);
         // todo; revise all these bools
         bool match_data = prev_sentence.Count > 0 && new_sentence.Count > 0;
         bool overwrite =

@@ -1,28 +1,25 @@
-using System;
 using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
-namespace conversational_fluency_trainer.Services;
+namespace conversational_fluency_trainer.services;
 
 public class WhisperRunner {
-    Process process_;
-
-    string whisper_path_ = Path.Combine(workspace.Paths.ProjectRoot, "dependencies/whisper-stream");
-    string model_path_ = Path.Combine(workspace.Paths.ProjectRoot, "dependencies/ggml-large-v3-turbo-q5_0.bin");
+    Process process_ = new Process();
+    readonly static string WHISPER_PATH = Path.Combine(
+        core.infra.Paths.ProjectRoot, "dependencies/whisper-stream");
+    readonly static string MODEL_PATH = Path.Combine(
+        core.infra.Paths.ProjectRoot, "dependencies/ggml-large-v3-turbo-q5_0.bin");
 
     public async Task RunAsync() {
         ProcessStartInfo psi = new () {
-            FileName = whisper_path_,
-            Arguments = $"-m \"{model_path_}\" -t 8 -l de -c 1",
+            FileName = WHISPER_PATH,
+            Arguments = $"-m \"{MODEL_PATH}\" -t 8 -l de -c 1",
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             RedirectStandardInput = false,
             UseShellExecute = false,
             CreateNoWindow = true,
-            WorkingDirectory = Path.GetDirectoryName(whisper_path_)
+            WorkingDirectory = Path.GetDirectoryName(WHISPER_PATH)
         };
 
-        process_ = new Process();
         process_.StartInfo = psi;
         process_.OutputDataReceived += OnOutputDataReceived;
         process_.ErrorDataReceived += OnErrorDataReceived;
