@@ -141,3 +141,20 @@ dotnet_naming_rule.enum_members_should_be_upper_snake_case.style = upper_snake_c
 
 dotnet_naming_symbols.enum_members.applicable_kinds = enum_member
 dotnet_naming_symbols.enum_members.applicable_accessibilities = public, protected, internal, private
+
+# Require explicit accessibility modifiers (public, private, internal, etc.)
+dotnet_style_require_accessibility_modifiers = always:warning
+
+# Disallow pattern matching variable declarations where possible
+dotnet_style_pattern_matching_over_as_with_null_check = false:error
+dotnet_style_pattern_matching_over_is_with_cast_check = false:error
+
+# Prefer explicit types over implicit/hidden declarations
+csharp_style_var_for_built_in_types = false:error
+csharp_style_var_when_type_is_apparent = false:error
+csharp_style_var_elsewhere = false:error
+# 1. Ban 'if (node is JsonObject obj)' variable declarations
+csharp_style_pattern_local_variable_expression = false:error
+
+# 2. Ban Tuple Deconstruction '(string prefix, JsonNode node) = stack.Pop()'
+csharp_style_destructured_variable_declaration = false:error

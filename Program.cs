@@ -10,7 +10,6 @@ public static class Program {
     public static async Task Main(string[] args) {
         // WhisperRunner wr = new WhisperRunner();
         // await wr.RunAsync();
-
         Console.WriteLine("Started");
     }
 }
