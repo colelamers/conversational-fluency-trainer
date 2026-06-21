@@ -1,22 +1,22 @@
 public class AppConfigModel {
-    public string? AppName { get; set; }
-    public string? LogLevel { get; set; }
-    public int MaxThreads { get; set; }
-    public AudioConfig? Audio { get; set; }
+  public string? AppName { get; set; }
+  public string? LogLevel { get; set; }
+  public int MaxThreads { get; set; }
+  public AudioConfig? Audio { get; set; }
 }
 
 public class AudioConfig {
-    public int DeviceIndex { get; set; }
-    public int SampleRate { get; set; }
-    public ComplexThingConfig? ComplexThing { get; set; }
+  public int DeviceIndex { get; set; }
+  public int SampleRate { get; set; }
+  public ComplexThingConfig? ComplexThing { get; set; }
 }
 
 public class ComplexThingConfig {
-    public AConfig? A { get; set; }
+  public AConfig? A { get; set; }
 }
 
 public class AConfig {
-    public int B { get; set; }
+  public int B { get; set; }
 }
 
 
@@ -27,13 +27,13 @@ public class AConfig {
   "logLevel": "Debug",
   "maxThreads": 6,
   "audio": {
-    "deviceIndex": 2,
-    "sampleRate": 16000,
-    "complex-thing": {
-        "a" : {
-            "b" : 3
-        }
+  "deviceIndex": 2,
+  "sampleRate": 16000,
+  "complex-thing": {
+    "a" : {
+      "b" : 3
     }
+  }
   }
 }
 
@@ -50,13 +50,13 @@ string appName = config.GetValue<string>("appName");
 
 // full model binding (IMPORTANT: not a method called Get<T>())
 AppConfigModel appConfig = JsonSerializer.Deserialize<AppConfigModel>(
-    config.GetRoot(),
-    new JsonSerializerOptions
-    {
-        PropertyNameCaseInsensitive = true,
-        ReadCommentHandling = JsonCommentHandling.Skip,
-        AllowTrailingCommas = true
-    }
+  config.GetRoot(),
+  new JsonSerializerOptions
+  {
+    PropertyNameCaseInsensitive = true,
+    ReadCommentHandling = JsonCommentHandling.Skip,
+    AllowTrailingCommas = true
+  }
 );
 
 Console.WriteLine(appConfig.AppName);

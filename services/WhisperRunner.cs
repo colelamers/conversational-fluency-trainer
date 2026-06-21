@@ -5,7 +5,7 @@ public class
 WhisperRunner {
   public async Task 
   RunAsync() {
-    ProcessStartInfo psi = new () {
+    ProcessStartInfo psi = new() {
       FileName = WHISPER_PATH,
       Arguments = $"-m \"{MODEL_PATH}\" -t 8 -l de -c 1",
       RedirectStandardOutput = true,
