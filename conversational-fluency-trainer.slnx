@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="conversational-fluency-trainer/conversational-fluency-trainer.csproj" />
+  <Project Path="tests.conversation-fluency-trainer/tests.conversation-fluency-trainer.csproj" />
+</Solution>

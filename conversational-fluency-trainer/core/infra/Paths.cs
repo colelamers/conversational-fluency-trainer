@@ -357,24 +357,25 @@ Paths {
   public static string 
   ConfsDirectory {
     get {
-      string root = core.infra.Paths.RepositoryRoot;
+      string root = core.infra.Paths.SolutionRoot;
       if (String.IsNullOrWhiteSpace(root)) {
         return "";
       }
 
-      string path = Path.Combine(root, "confs");
-      return path;
+      // Points to: ~/apps/conversation-fluency-trainer/confs
+      return Path.Combine(root, "confs");
     }
   }
 
   public static string 
   LogsDirectory {
     get {
-      string root = core.infra.Paths.RepositoryRoot;
+      string root = core.infra.Paths.SolutionRoot;
       if (String.IsNullOrWhiteSpace(root)) {
         return "";
       }
 
+      // Points to: ~/apps/conversation-fluency-trainer/logs
       string path = Path.Combine(root, "logs");
       Directory.CreateDirectory(path);
       return path;
@@ -384,13 +385,13 @@ Paths {
   public static string
   DepsDirectory {
     get {
-      string root = core.infra.Paths.RepositoryRoot;
+      string root = core.infra.Paths.SolutionRoot;
       if (String.IsNullOrWhiteSpace(root)) {
         return "";
       }
 
-      string path = Path.Combine(root, "deps");
-      return path;
+      // Points to: ~/apps/conversation-fluency-trainer/deps
+      return Path.Combine(root, "deps");
     }
   }
 
@@ -428,7 +429,8 @@ Paths {
     get {
       DirectoryInfo? dir = new DirectoryInfo(AppContext.BaseDirectory);
       while (dir != null) {
-        if (dir.GetFiles("*.sln").Length > 0) {
+        // Walks up until it finds your conversational-fluency-trainer.slnx
+        if (dir.GetFiles("*.slnx").Length > 0 || dir.GetFiles("*.sln").Length > 0) {
           return dir.FullName;
         }
 
@@ -444,21 +446,27 @@ Paths {
   // Windows:
   //   C:\Dev\MyApp\MyApp.sln
   public static string 
-  SolutionFile {
-    get {
-      string root = core.infra.Paths.SolutionRoot;
-      if (String.IsNullOrWhiteSpace(root)) {
-        return "";
-      }
+    SolutionFile {
+      get {
+        string root = core.infra.Paths.SolutionRoot;
+        if (String.IsNullOrWhiteSpace(root)) {
+          return "";
+        }
 
-      FileInfo? file = first_or_default(new DirectoryInfo(root).GetFiles("*.sln"), ".sln");
-      if (file == null) {
-        return "";
-      }
+        DirectoryInfo? dir_info = new DirectoryInfo(root);
+        FileInfo? file = first_or_default(dir_info.GetFiles("*.slnx"), ".slnx");
+        
+        if (file == null) {
+          file = first_or_default(dir_info.GetFiles("*.sln"), ".sln");
+        }
 
-      return file.FullName;
+        if (file == null) {
+          return "";
+        }
+
+        return file.FullName;
+      }
     }
-  }
 
   // --------------------------------------------------------------------
   // REPOSITORY ROOT

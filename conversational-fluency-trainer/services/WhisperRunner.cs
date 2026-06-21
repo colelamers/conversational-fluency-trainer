@@ -44,9 +44,9 @@ WhisperRunner {
 
   private Process process_ = new Process();
   private readonly static string WHISPER_PATH = Path.Combine(
-    core.infra.Paths.ProjectRoot, "dependencies/whisper-stream");
+    core.infra.Paths.ProjectRoot, "deps/whisper-stream");
   private readonly static string MODEL_PATH = Path.Combine(
-    core.infra.Paths.ProjectRoot, "dependencies/ggml-large-v3-turbo-q5_0.bin");
+    core.infra.Paths.ProjectRoot, "deps/ggml-large-v3-turbo-q5_0.bin");
 
   private readonly static HashSet<string> WHISPER_FILL_INS_TO_SKIP = new HashSet<string>
   {
