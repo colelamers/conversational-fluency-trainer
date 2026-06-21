@@ -22,7 +22,7 @@ PhraseIngester<T> where T : notnull {
     dawg_.Insert(tokens);
     
     // Boost structural traversal weight along the exact sequence path
-    Node<T>? current = null;
+    Node<T>? current;
     if (dawg_.NodeMap.TryGetValue(tokens[0], out current) == true) {
       for (int i = 1; i < tokens.Count; i++) {
         Node<T>? next;

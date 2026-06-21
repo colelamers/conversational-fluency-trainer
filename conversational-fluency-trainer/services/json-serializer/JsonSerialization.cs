@@ -61,7 +61,7 @@ JsonSerializer {
         throw new InvalidOperationException("Invalid path structure.");
       }
 
-      JsonNode? next = null;
+      JsonNode? next;
       bool exists = obj.TryGetPropertyValue(parts[i], out next);
 
       if (!exists || next == null) {
@@ -85,30 +85,34 @@ JsonSerializer {
   GetKeys(string path) {
     JsonNode node = resolve(path);
 
-    if (node is not JsonObject obj) {
-      yield break;
+    List<string> keys = new List<string>();
+    if (node is JsonObject == false) {
+      return keys;
     }
 
+    JsonObject obj = (JsonObject)node;
     foreach (KeyValuePair<string, JsonNode?> kv in obj) {
-      yield return kv.Key;
+      keys.Add(kv.Key);
     }
+
+    return keys;
   }
 
   public IEnumerable<string> 
   GetAllKeysDeep(string path) {
     JsonNode start = resolve(path);
 
-    // Use the explicit struct instead of a tuple
+    // 1. Eager allocation: This list stays entirely on the local stack scope
+    List<string> results = new List<string>();
+
     Stack<StackFrame> stack = new Stack<StackFrame>();
     stack.Push(new StackFrame("", start));
 
     while (stack.Count > 0) {
-      // Pop a single, explicit object. No multi-value unpacking/deconstruction!
       StackFrame current_frame = stack.Pop();
       string prefix = current_frame.Prefix;
       JsonNode node = current_frame.Node;
 
-      // Traditional explicit type check instead of 'is JsonObject obj'
       if (node is JsonObject) {
         JsonObject obj = (JsonObject)node;
 
@@ -122,7 +126,7 @@ JsonSerializer {
             full_key = prefix + "." + kv.Key;
           }
 
-          yield return full_key;
+          results.Add(full_key);
 
           if (kv.Value != null) {
             stack.Push(new StackFrame(full_key, kv.Value));
@@ -130,6 +134,8 @@ JsonSerializer {
         }
       }
     }
+
+    return results;
   }
 
   private JsonNode 
