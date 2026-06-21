@@ -1,4 +1,6 @@
 <Solution>
-  <Project Path="conversational-fluency-trainer/conversational-fluency-trainer.csproj" />
-  <Project Path="tests.conversation-fluency-trainer/tests.conversation-fluency-trainer.csproj" />
+  <Folder Name="/tests/">
+    <Project Path="tests/tests.csproj" Type="vae06521-97b4-43c2-a4d5-a1bb2ff9b1f2" />
+  </Folder>
+  <Project Path="conversational-fluency-trainer/conversational-fluency-trainer.csproj" Type="vae06521-97b4-43c2-a4d5-a1bb2ff9b1f2" />
 </Solution>

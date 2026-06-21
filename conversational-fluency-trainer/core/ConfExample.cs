@@ -1,3 +1,4 @@
+// todo 1; get rid of this after you have config setup
 public class AppConfigModel {
   public string? AppName { get; set; }
   public string? LogLevel { get; set; }

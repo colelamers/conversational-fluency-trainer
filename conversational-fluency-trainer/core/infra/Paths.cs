@@ -362,7 +362,7 @@ Paths {
         return "";
       }
 
-      // Points to: ~/apps/conversation-fluency-trainer/confs
+      // Points to: ~/apps/conversational-fluency-trainer/confs
       return Path.Combine(root, "confs");
     }
   }
@@ -375,7 +375,7 @@ Paths {
         return "";
       }
 
-      // Points to: ~/apps/conversation-fluency-trainer/logs
+      // Points to: ~/apps/conversational-fluency-trainer/logs
       string path = Path.Combine(root, "logs");
       Directory.CreateDirectory(path);
       return path;
@@ -386,11 +386,11 @@ Paths {
   DepsDirectory {
     get {
       string root = core.infra.Paths.SolutionRoot;
-      if (String.IsNullOrWhiteSpace(root)) {
+      if (string.IsNullOrWhiteSpace(root)) {
         return "";
       }
 
-      // Points to: ~/apps/conversation-fluency-trainer/deps
+      // Points to: ~/apps/conversational-fluency-trainer/deps
       return Path.Combine(root, "deps");
     }
   }

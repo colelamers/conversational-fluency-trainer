@@ -43,10 +43,13 @@ WhisperRunner {
   }
 
   private Process process_ = new Process();
+  // todo 3; these are gonna need a unit test
+  // todo 2; make global file of consts so unit tests are consistent and paths
+  //         stable/findable
   private readonly static string WHISPER_PATH = Path.Combine(
-    core.infra.Paths.ProjectRoot, "deps/whisper-stream");
+    core.infra.Paths.DepsDirectory, "whisper-stream");
   private readonly static string MODEL_PATH = Path.Combine(
-    core.infra.Paths.ProjectRoot, "deps/ggml-large-v3-turbo-q5_0.bin");
+    core.infra.Paths.DepsDirectory, "ggml-large-v3-turbo-q5_0.bin");
 
   private readonly static HashSet<string> WHISPER_FILL_INS_TO_SKIP = new HashSet<string>
   {
