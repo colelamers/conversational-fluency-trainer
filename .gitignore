@@ -89,7 +89,7 @@ Desktop.ini
 # =========================================================
 # RUNTIME GENERATED FILES (your kind of project)
 # =========================================================
-dependencies/
+deps/
 *.onnx
 *.bin
 *.gguf
