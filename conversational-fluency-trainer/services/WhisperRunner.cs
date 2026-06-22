@@ -1,12 +1,15 @@
 using System.Diagnostics;
+using core.strucutres.dawg.models;
 namespace conversational_fluency_trainer.services;
 
 public class 
 WhisperRunner {
+  private DirectedAcyclicWordGraph<string> said_words_ = new();
   public async Task 
   RunAsync() {
     ProcessStartInfo psi = new() {
       FileName = WHISPER_PATH,
+      // todo 1; can be added to config
       Arguments = $"-m \"{MODEL_PATH}\" -t 8 -l de -c 1",
       RedirectStandardOutput = true,
       RedirectStandardError = true,
@@ -19,7 +22,9 @@ WhisperRunner {
     process_.StartInfo = psi;
     process_.OutputDataReceived += on_output_data_received;
     process_.ErrorDataReceived += on_error_data_received;
-
+    // Note: there is a problem running this in debug move that it holds onto
+    // the process in memory and you need to force kill the task to free up 
+    // the gpu vram.
     process_.Start();
 
     process_.BeginOutputReadLine();
@@ -31,6 +36,10 @@ WhisperRunner {
   private void 
   on_output_data_received(object sender, DataReceivedEventArgs e) {
     if (!string.IsNullOrWhiteSpace(e.Data)) {
+      // todo 1; so right now we need to read in the data, split the string like
+      // i did before, then clean it up like i had originally where it's 
+      // then added as a list because the input from whisper.cpp is very unclean
+      said_words_.Insert(core.algs.Tokenizer.CleanSplitFilterToken(e.Data, WHISPER_FILL_INS_TO_SKIP));
       Console.WriteLine("STDOUT: " + e.Data);
     }
   }
@@ -53,7 +62,8 @@ WhisperRunner {
 
   private readonly static HashSet<string> WHISPER_FILL_INS_TO_SKIP = new HashSet<string>
   {
-    "", " ", " .", " . ", " .\n", " .\x1b[2K\n",
+    "", " ", " .", " . ", " .\n", "2k", " .\x1b[2K\n",
+    "[2k",
     "(clapping)", "(explosion)", "(explosion)\x1b[2K",
     "(explosions)", "(explosions)\x1b[2K",
     "(fire crackling)", "(giggles)", "(humming)",

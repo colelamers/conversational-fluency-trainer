@@ -1,93 +1,96 @@
-namespace core.strucutres.dawg.models;
+using System;
+using System.Collections.Generic;
+using core.strucutres.dawg.models;
+public class DirectedAcyclicWordGraph<T> where T : IComparable<T> {
+  public Dictionary<T, Node<T>> NodeMap = new Dictionary<T, Node<T>>();
 
-public class 
-DirectedAcyclicWordGraph<T> where T : notnull {
-  public SortedDictionary<T, Node<T>> NodeMap = new();
-  public List<LinkedNode<T>> SentenceHeads = new();
-
-  public void 
-  Insert(List<T> nodes) {
-    if (nodes.Count == 0) {
+  public void Insert(List<T> sequence) {
+    if (sequence.Count == 0) {
       return;
     }
 
-    T node_at_zero = nodes[0];
-    Node<T>? current;
-    if (!NodeMap.TryGetValue(node_at_zero, out current)) {
-      current = new Node<T>(node_at_zero);
-      NodeMap.Add(node_at_zero, current);
-    }
+    Node<T>? current = get_or_create(sequence[0]);
 
-    LinkedNode<T> head = new(current);
-    LinkedNode<T> cursor = head;
+    for (int i = 1; i < sequence.Count; i++) {
+      T value = sequence[i];
+      Node<T>? next = find_child(current, value);
 
-    for (int i = 1; i < nodes.Count; i++) {
-      T node_at_i = nodes[i];
-      Node<T>? next;
-
-      if (!current.Children.TryGetValue(node_at_i, out next)) {
-        if (!NodeMap.TryGetValue(node_at_i, out next)) {
-          next = new Node<T>(node_at_i);
-          NodeMap.Add(node_at_i, next);
-        }
-        current.AddChild(node_at_i, next);
+      if (next == null) {
+        next = get_or_create(value);
+        current.AddChild(next);
+        next.AddParent(current);
       }
 
-      LinkedNode<T>? next_linked = new(next);
-      cursor.Next = next_linked;
-      next_linked.Prev = cursor;
-      cursor = next_linked;
       current = next;
     }
 
-    Node<T>? final_node;
-    if (NodeMap.TryGetValue(nodes[nodes.Count - 1], out final_node)) {
-      final_node.CanBeEndOfWord = true;
-    }
-    
-    SentenceHeads.Add(head);
+    current.IsTerminal = true;
   }
 
-  public void 
-  Insert(T prev, T current) {
-    Node<T>? current_node;
-    if (!NodeMap.TryGetValue(current, out current_node)) {
-      current_node = new Node<T>(current);
-      NodeMap.Add(current, current_node);
-    }
-
-    Node<T>? prev_node;
-    if (NodeMap.TryGetValue(prev, out prev_node)) {
-      prev_node.AddChild(current, current_node);
-      current_node.AddParent(prev, prev_node);
-    }
+  public void Add(T value) {
+    get_or_create(value);
   }
 
-  public void 
-  Insert(T current) {
-    Node<T>? current_node;
-    if (!NodeMap.TryGetValue(current, out current_node)) {
-      current_node = new Node<T>(current);
-      NodeMap.Add(current, current_node);
-    }
+  public void Add(T parent, T child) {
+    Node<T> parent_node = get_or_create(parent);
+    Node<T> child_node = get_or_create(child);
+
+    parent_node.AddChild(child_node);
+    child_node.AddParent(parent_node);
   }
 
-  public bool 
-  Contains(List<T> sequence) {
+  public bool Contains(List<T> sequence) {
     if (sequence.Count == 0) {
       return false;
     }
 
     Node<T>? current;
-    if (!NodeMap.TryGetValue(sequence[0], out current)) {
+
+    if (NodeMap.ContainsKey(sequence[0])) {
+      current = NodeMap[sequence[0]];
+    }
+    else {
       return false;
     }
 
     for (int i = 1; i < sequence.Count; i++) {
-      if (!current.Children.TryGetValue(sequence[i], out current)) {
+      current = find_child(current, sequence[i]);
+
+      if (current == null) {
         return false;
       }
     }
-    return true;
+
+    return current.IsTerminal;
+  }
+
+  private Node<T> get_or_create(T value) {
+    Node<T>? node;
+
+    if (NodeMap.ContainsKey(value)) {
+      node = NodeMap[value];
+    }
+    else {
+      node = new Node<T>(value);
+      NodeMap.Add(value, node);
+    }
+    
+    NodeMap[value].Weight++;
+
+    return node;
+  }
+
+  private Node<T>? find_child(Node<T> parent, T value) {
+    for (int i = 0; i < parent.Children.Count; i++) {
+      Node<T> child = parent.Children[i];
+
+      if (child.Value.CompareTo(value) == 0) {
+        return child;
+      }
+    }
+
+    return null;
   }
 }
+
+

@@ -6,7 +6,8 @@ WordWindow {
   public int Offset { get; }
   public int Length { get; }
 
-  public WordWindow(List<string> words, int offset, int length) {
+  public 
+  WordWindow(List<string> words, int offset, int length) {
     Words = words;
     Offset = offset;
     Length = length;
