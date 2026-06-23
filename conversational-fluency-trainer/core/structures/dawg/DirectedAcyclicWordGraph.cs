@@ -4,16 +4,36 @@ using core.strucutres.dawg.models;
 
 namespace core.strucutres.dawg;
 
-public class DirectedAcyclicWordGraph<T>
-    where T : class, IComparable<T> {
-  public Dictionary<T, Node<T>> NodeMap;
+public class DirectedAcyclicWordGraph {
+  public Dictionary<string, Node> NodeMap;
 
   public DirectedAcyclicWordGraph() {
-    NodeMap = new Dictionary<T, Node<T>>();
+    NodeMap = new Dictionary<string, Node>();
   }
 
+public void LoadFromStream(Stream stream) {
+  if (stream == null) {
+    throw new ArgumentNullException(nameof(stream));
+  }
+
+  using StreamReader reader = new StreamReader(stream);
+
+  while (!reader.EndOfStream) {
+    string? line = reader.ReadLine();
+
+    if (string.IsNullOrWhiteSpace(line)) {
+      continue;
+    }
+
+    List<string> tokens =
+      core.algs.Tokenizer.CleanAndSplitToken(line);
+
+    Insert(tokens);
+  }
+}
+
   public void
-  Insert(List<T> sequence) {
+  Insert(List<string> sequence) {
     if (sequence == null) {
       throw new ArgumentNullException(nameof(sequence));
     }
@@ -22,12 +42,12 @@ public class DirectedAcyclicWordGraph<T>
       return;
     }
 
-    Node<T> current = get_or_create(sequence[0]);
+    Node current = get_or_create(sequence[0]);
 
     int i = 1;
     while (i < sequence.Count) {
-      T value = sequence[i];
-      Node<T> next = get_or_create(value);
+      string value = sequence[i];
+      Node next = get_or_create(value);
 
       current.AddChild(next);
       next.AddParent(current);
@@ -39,15 +59,15 @@ public class DirectedAcyclicWordGraph<T>
     current.IsTerminal = true;
   }
 
-  public List<T>
-  WalkFrom(List<T> sequence, int length) {
-    List<T> output = new List<T>();
+  public List<string>
+  WalkFrom(List<string> sequence, int length) {
+    List<string> output = new List<string>();
 
     if (sequence == null || sequence.Count == 0) {
       return output;
     }
 
-    Node<T>? current;
+    Node? current;
 
     if (!NodeMap.TryGetValue(sequence[0], out current)) {
       return output;
@@ -56,9 +76,9 @@ public class DirectedAcyclicWordGraph<T>
     int i = 1;
 
     while (i < sequence.Count) {
-      T value = sequence[i];
+      string value = sequence[i];
 
-      if (!current.Children.TryGetValue(value, out Edge<T>? edge)) {
+      if (!current.Children.TryGetValue(value, out Edge? edge)) {
         return output;
       }
 
@@ -71,7 +91,7 @@ public class DirectedAcyclicWordGraph<T>
     int step = 0;
 
     while (step < length) {
-      Node<T>? next = choose_next(current);
+      Node? next = choose_next(current);
 
       if (next == null) {
         break;
@@ -86,26 +106,24 @@ public class DirectedAcyclicWordGraph<T>
     return output;
   }
 
-  public List<T>
+  public List<string>
   WalkRandom(int min, int max) {
-    List<T> output = new List<T>();
+    List<string> output = new();
 
-    T? start = GetRandomStart();
+    string? start = GetRandomStart();
 
     if (start == null) {
       return output;
     }
 
-    Node<T> current = NodeMap[start];
+    Node current = NodeMap[start];
 
     output.Add(current.Value);
-
     int length = random_.Next(min, max + 1);
-
     int i = 0;
 
     while (i < length) {
-      Node<T>? next = choose_next(current);
+      Node? next = choose_next(current);
 
       if (next == null) {
         break;
@@ -120,11 +138,11 @@ public class DirectedAcyclicWordGraph<T>
     return output;
   }
 
-  public T?
+  public string?
   GetRandomStart() {
     int total = 0;
 
-    foreach (Node<T> node in NodeMap.Values) {
+    foreach (Node node in NodeMap.Values) {
       total += node.Weight;
     }
 
@@ -134,7 +152,7 @@ public class DirectedAcyclicWordGraph<T>
 
     int roll = random_.Next(total);
 
-    foreach (KeyValuePair<T, Node<T>> pair in NodeMap) {
+    foreach (KeyValuePair<string, Node> pair in NodeMap) {
       roll -= pair.Value.Weight;
 
       if (roll < 0) {
@@ -145,11 +163,11 @@ public class DirectedAcyclicWordGraph<T>
     return null;
   }
 
-  private Node<T>?
-  choose_next(Node<T> node) {
+  private Node?
+  choose_next(Node node) {
     int total = 0;
 
-    foreach (Edge<T> edge in node.Children.Values) {
+    foreach (Edge edge in node.Children.Values) {
       total += edge.Count;
     }
 
@@ -160,7 +178,7 @@ public class DirectedAcyclicWordGraph<T>
     int roll = random_.Next(total);
     int current = 0;
 
-    foreach (Edge<T> edge in node.Children.Values) {
+    foreach (Edge edge in node.Children.Values) {
       current += edge.Count;
 
       if (roll < current) {
@@ -172,11 +190,11 @@ public class DirectedAcyclicWordGraph<T>
   }
 
 
-  public List<T>
-  Walk(T start, int steps) {
-    List<T> output = new List<T>();
+  public List<string>
+  Walk(string start, int steps) {
+    List<string> output = new List<string>();
 
-    if (!NodeMap.TryGetValue(start, out Node<T>? current)) {
+    if (!NodeMap.TryGetValue(start, out Node? current)) {
       return output;
     }
 
@@ -184,7 +202,7 @@ public class DirectedAcyclicWordGraph<T>
 
     int i = 0;
     while (i < steps) {
-      Node<T>? next = choose_next(current);
+      Node? next = choose_next(current);
 
       if (next == null) {
         break;
@@ -198,11 +216,12 @@ public class DirectedAcyclicWordGraph<T>
     return output;
   }
 
-  private Edge<T>? get_best_edge(Node<T> node) {
-    Edge<T>? best = null;
+  private Edge?
+  get_best_edge(Node node) {
+    Edge? best = null;
     int best_weight = 0;
 
-    foreach (Edge<T> next in node.Children.Values) {
+    foreach (Edge next in node.Children.Values) {
       if (next.Count > best_weight) {
         best = next;
         best_weight = next.Count;
@@ -212,22 +231,20 @@ public class DirectedAcyclicWordGraph<T>
     return best;
   }
 
-  private int compare_suggestions(Suggestion<T> a, Suggestion<T> b) {
+  private int
+  compare_suggestions(Suggestion a, Suggestion b) {
     return b.Weight.CompareTo(a.Weight);
   }
 
-  public List<Suggestion<T>> GetSuggestions(
-      List<T> sequence,
-      int amount,
-      int preview_length
-  ) {
-    List<Suggestion<T>> suggestions = new();
+  public List<Suggestion>
+  GetSuggestions(List<string> sequence, int amount, int preview_length) {
+    List<Suggestion> suggestions = new();
 
     if (sequence == null || sequence.Count == 0) {
       return suggestions;
     }
 
-    Node<T>? current;
+    Node? current;
 
     if (!NodeMap.TryGetValue(sequence[0], out current)) {
       return suggestions;
@@ -235,7 +252,7 @@ public class DirectedAcyclicWordGraph<T>
 
     int i = 1;
     while (i < sequence.Count) {
-      if (!current.Children.TryGetValue(sequence[i], out Edge<T>? edge)) {
+      if (!current.Children.TryGetValue(sequence[i], out Edge? edge)) {
         return suggestions;
       }
 
@@ -243,13 +260,13 @@ public class DirectedAcyclicWordGraph<T>
       i++;
     }
 
-    foreach (Edge<T> edge in current.Children.Values) {
-      List<T> preview = new();
-      Node<T> walk = edge.Target;
+    foreach (Edge edge in current.Children.Values) {
+      List<string> preview = new();
+      Node walk = edge.Target;
       int count = 0;
 
       while (count < preview_length) {
-        Edge<T>? best = get_best_edge(walk);
+        Edge? best = get_best_edge(walk);
 
         if (best == null) {
           break;
@@ -262,7 +279,7 @@ public class DirectedAcyclicWordGraph<T>
         count++;
       }
 
-      suggestions.Add(new Suggestion<T>(edge.Target.Value, edge.Count, preview));
+      suggestions.Add(new Suggestion(edge.Target.Value, edge.Count, preview));
     }
 
     suggestions.Sort(compare_suggestions);
@@ -275,21 +292,21 @@ public class DirectedAcyclicWordGraph<T>
   }
 
   public void
-  Add(T value) {
+  Add(string value) {
     get_or_create(value);
   }
 
   public void
-  Add(T parent, T child) {
-    Node<T> parent_node = get_or_create(parent);
-    Node<T> child_node = get_or_create(child);
+  Add(string parent, string child) {
+    Node parent_node = get_or_create(parent);
+    Node child_node = get_or_create(child);
 
     parent_node.AddChild(child_node);
     child_node.AddParent(parent_node);
   }
 
   public bool
-  Contains(List<T> sequence) {
+  Contains(List<string> sequence) {
     if (sequence == null) {
       throw new ArgumentNullException(nameof(sequence));
     }
@@ -298,15 +315,15 @@ public class DirectedAcyclicWordGraph<T>
       return false;
     }
 
-    if (!NodeMap.TryGetValue(sequence[0], out Node<T>? current)) {
+    if (!NodeMap.TryGetValue(sequence[0], out Node? current)) {
       return false;
     }
 
     int i = 1;
     while (i < sequence.Count) {
-      T value = sequence[i];
+      string value = sequence[i];
 
-      if (!current.Children.TryGetValue(value, out Edge<T>? edge)) {
+      if (!current.Children.TryGetValue(value, out Edge? edge)) {
         return false;
       }
 
@@ -317,10 +334,10 @@ public class DirectedAcyclicWordGraph<T>
     return current.IsTerminal;
   }
 
-  private Node<T>
-  get_or_create(T value) {
-    if (!NodeMap.TryGetValue(value, out Node<T>? node)) {
-      node = new Node<T>(value);
+  private Node
+  get_or_create(string value) {
+    if (!NodeMap.TryGetValue(value, out Node? node)) {
+      node = new Node(value);
       NodeMap[value] = node;
     }
 

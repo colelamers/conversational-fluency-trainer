@@ -1,14 +1,10 @@
 namespace core.strucutres.dawg.models;
-public class Suggestion<T> {
-  public T Value;
+public class Suggestion {
+  public string Value;
   public int Weight;
-  public List<T> Preview;
+  public List<string> Preview;
 
-  public Suggestion(
-      T value,
-      int weight,
-      List<T> preview
-  ) {
+  public Suggestion(string value, int weight, List<string> preview) {
     Value = value;
     Weight = weight;
     Preview = preview;

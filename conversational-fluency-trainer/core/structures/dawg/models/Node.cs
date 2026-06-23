@@ -1,34 +1,34 @@
 namespace core.strucutres.dawg.models;
 
-public class Node<T> where T : class, IComparable<T> {
-  public T Value;
+public class Node {
+  public string Value;
   public bool IsTerminal;
   public int Weight;
 
-  public Dictionary<T, Edge<T>> Children;
-  public Dictionary<T, Edge<T>> Parents;
+  public Dictionary<string, Edge> Children;
+  public Dictionary<string, Edge> Parents;
 
-  public Node(T value) {
+  public Node(string value) {
     Value = value;
-    Children = new Dictionary<T, Edge<T>>();
-    Parents = new Dictionary<T, Edge<T>>();
+    Children = new Dictionary<string, Edge>();
+    Parents = new Dictionary<string, Edge>();
   }
 
-  public void AddChild(Node<T> node) {
-    if (Children.TryGetValue(node.Value, out Edge<T>? edge)) {
+  public void AddChild(Node node) {
+    if (Children.TryGetValue(node.Value, out Edge? edge)) {
       edge.Increment();
     }
     else {
-      Children[node.Value] = new Edge<T>(node);
+      Children[node.Value] = new Edge(node);
     }
   }
 
-  public void AddParent(Node<T> node) {
-    if (Parents.TryGetValue(node.Value, out Edge<T>? edge)) {
+  public void AddParent(Node node) {
+    if (Parents.TryGetValue(node.Value, out Edge? edge)) {
       edge.Increment();
     }
     else {
-      Parents[node.Value] = new Edge<T>(node);
+      Parents[node.Value] = new Edge(node);
     }
   }
 }

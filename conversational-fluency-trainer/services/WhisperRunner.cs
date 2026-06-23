@@ -6,7 +6,7 @@ namespace conversational_fluency_trainer.services;
 
 public class
 WhisperRunner {
-  private DirectedAcyclicWordGraph<string> said_words_ = new();
+  private DirectedAcyclicWordGraph said_words_ = new();
   public async Task
   RunAsync() {
     ProcessStartInfo psi = new() {
@@ -41,9 +41,9 @@ WhisperRunner {
       List<string> words = core.algs.Tokenizer.CleanSplitFilterToken(e.Data, WHISPER_FILL_INS_TO_SKIP);
       said_words_.Insert(words);
       Console.WriteLine("STDOUT: " + e.Data);
-      List<Suggestion<string>> suggestions = said_words_.GetSuggestions(words,5,3);
+      List<Suggestion> suggestions = said_words_.GetSuggestions(words,5,3);
       Console.WriteLine("DAWG suggestions:");
-      foreach (Suggestion<string> item in suggestions) {
+      foreach (Suggestion item in suggestions) {
         Console.WriteLine(item.Value + " (" + item.Weight + ") - " + string.Join(" ", item.Preview));
       }
     }

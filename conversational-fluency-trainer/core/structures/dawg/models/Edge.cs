@@ -1,11 +1,10 @@
 namespace core.strucutres.dawg.models;
 
-public class Edge<T>
-    where T : class, IComparable<T> {
-  public Node<T> Target;
+public class Edge {
+  public Node Target;
   public int Count;
 
-  public Edge(Node<T> target) {
+  public Edge(Node target) {
     Target = target;
     Count = 1;
   }
