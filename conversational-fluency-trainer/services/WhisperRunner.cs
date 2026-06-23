@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Text;
+using core.strucutres.dawg;
 using core.strucutres.dawg.models;
 namespace conversational_fluency_trainer.services;
 
@@ -10,7 +12,7 @@ WhisperRunner {
     ProcessStartInfo psi = new() {
       FileName = WHISPER_PATH,
       // todo 1; can be added to config
-      Arguments = $"-m \"{MODEL_PATH}\" -t 8 -l de -c 1",
+      Arguments = $"-m \"{MODEL_PATH}\" -t 8 -l de -c 2",
       RedirectStandardOutput = true,
       RedirectStandardError = true,
       RedirectStandardInput = false,
@@ -42,7 +44,15 @@ WhisperRunner {
       said_words_.Insert(core.algs.Tokenizer.CleanSplitFilterToken(e.Data, WHISPER_FILL_INS_TO_SKIP));
       Console.WriteLine("STDOUT: " + e.Data);
     }
+    List<string> result = said_words_.Walk("ich", 10);
+    StringBuilder sb = new();
+    foreach (string word in result) {
+      sb.Append(word + " ");
+    }
+    Console.WriteLine("DAWG: " + sb.ToString());
   }
+
+  
 
   private void 
   on_error_data_received(object sender, DataReceivedEventArgs e) {
