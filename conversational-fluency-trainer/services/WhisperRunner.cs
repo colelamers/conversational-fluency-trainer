@@ -4,10 +4,10 @@ using core.strucutres.dawg;
 using core.strucutres.dawg.models;
 namespace conversational_fluency_trainer.services;
 
-public class 
+public class
 WhisperRunner {
   private DirectedAcyclicWordGraph<string> said_words_ = new();
-  public async Task 
+  public async Task
   RunAsync() {
     ProcessStartInfo psi = new() {
       FileName = WHISPER_PATH,
@@ -35,26 +35,21 @@ WhisperRunner {
     await process_.WaitForExitAsync();
   }
 
-  private void 
+  private void
   on_output_data_received(object sender, DataReceivedEventArgs e) {
     if (!string.IsNullOrWhiteSpace(e.Data)) {
-      // todo 1; so right now we need to read in the data, split the string like
-      // i did before, then clean it up like i had originally where it's 
-      // then added as a list because the input from whisper.cpp is very unclean
-      said_words_.Insert(core.algs.Tokenizer.CleanSplitFilterToken(e.Data, WHISPER_FILL_INS_TO_SKIP));
+      List<string> words = core.algs.Tokenizer.CleanSplitFilterToken(e.Data, WHISPER_FILL_INS_TO_SKIP);
+      said_words_.Insert(words);
       Console.WriteLine("STDOUT: " + e.Data);
+      List<Suggestion<string>> suggestions = said_words_.GetSuggestions(words,5,3);
+      Console.WriteLine("DAWG suggestions:");
+      foreach (Suggestion<string> item in suggestions) {
+        Console.WriteLine(item.Value + " (" + item.Weight + ") - " + string.Join(" ", item.Preview));
+      }
     }
-    List<string> result = said_words_.Walk("ich", 10);
-    StringBuilder sb = new();
-    foreach (string word in result) {
-      sb.Append(word + " ");
-    }
-    Console.WriteLine("DAWG: " + sb.ToString());
   }
 
-  
-
-  private void 
+  private void
   on_error_data_received(object sender, DataReceivedEventArgs e) {
     if (!string.IsNullOrWhiteSpace(e.Data)) {
       Console.WriteLine("STDERR: " + e.Data);
