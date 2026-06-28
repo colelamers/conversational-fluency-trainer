@@ -1,0 +1,80 @@
+{
+  "Whisper": {
+    "FileNames": {
+      "Executable": "whisper-stream",
+      "Model": "ggml-large-v3-turbo-q5_0.bin"
+    },
+
+    "Arguments": {
+      "Threads": 8,
+      "Language": "de",
+      "Processors": 2
+    },
+
+    "Process": {
+      "RedirectOutput": true,
+      "RedirectError": true,
+      "RedirectInput": false,
+      "UseShellExecute": false,
+      "CreateNoWindow": true
+    },
+
+    "Filters": [
+      "",
+      " ",
+      " .",
+      " . ",
+      " .\n",
+      "2k",
+      " .\u001b[2K\n",
+      "[2k]",
+      "(clapping)",
+      "(explosion)",
+      "(explosion)\u001b[2K",
+      "(explosions)",
+      "(explosions)\u001b[2K",
+      "(fire crackling)",
+      "(giggles)",
+      "(humming)",
+      "(laughing)",
+      "(mimics whooshing)",
+      "(water",
+      "(water splashing)",
+      "[2K]",
+      "[BLANK_AUDIO]",
+      "[BLANK_AUDIO]\u001b[2K",
+      "[MUSIC]",
+      "* Musik *",
+      "Musik",
+      "MUSIK",
+      "*sad",
+      "music*",
+      "[SPEAKING",
+      "[Start",
+      "*laughs*",
+      "*Loud",
+      "noise*",
+      ".",
+      "Device",
+      "Device 0:",
+      "ggml_cuda_init:",
+      "init:",
+      "main:",
+      "whisper_backend_init_gpu:",
+      "whisper_init_from_file_with_params_no_state:",
+      "whisper_init_state:",
+      "whisper_init_with_params_no_state:",
+      "whisper_model_load:",
+      "\u001b",
+      "\u001b[2K",
+      "[",
+      "Silence",
+      "]",
+      "[Start speaking]"
+    ]
+  },
+
+  "Dawg": {
+    "TrainingDirectory": "/var/tmp/de/"
+  }
+}

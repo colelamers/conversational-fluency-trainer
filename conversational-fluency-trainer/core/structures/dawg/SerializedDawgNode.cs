@@ -1,2 +1,0 @@
-namespace core.strucutres.dawg;
-

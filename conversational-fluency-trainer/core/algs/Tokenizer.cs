@@ -101,7 +101,11 @@ Tokenizer {
     List<string> tokens = new();
     Span<char> buffer = stackalloc char[word.Length];
     int pos = 0;
-
+    if (word.Length > 1) {
+      if (word[0].Equals('[') || word[word.Length - 1].Equals(']')) {
+        return tokens;
+      }
+    }
     foreach (char c in word) {
       if (char.IsWhiteSpace(c)) {
         if (pos > 0) {

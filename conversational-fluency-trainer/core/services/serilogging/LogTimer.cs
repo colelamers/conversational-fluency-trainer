@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace conversational_fluency_trainer.services.serilogging;
+namespace core.services.serilogging;
 
 public class 
 LogTimer : IDisposable {

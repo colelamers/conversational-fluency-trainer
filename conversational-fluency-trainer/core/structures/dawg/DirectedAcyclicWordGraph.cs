@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using core.strucutres.dawg.models;
 
 namespace core.strucutres.dawg;
@@ -11,26 +9,24 @@ public class DirectedAcyclicWordGraph {
     NodeMap = new Dictionary<string, Node>();
   }
 
-public void LoadFromStream(Stream stream) {
-  if (stream == null) {
-    throw new ArgumentNullException(nameof(stream));
-  }
-
-  using StreamReader reader = new StreamReader(stream);
-
-  while (!reader.EndOfStream) {
-    string? line = reader.ReadLine();
-
-    if (string.IsNullOrWhiteSpace(line)) {
-      continue;
+  public void LoadFromStream(Stream stream) {
+    if (stream == null) {
+      throw new ArgumentNullException(nameof(stream));
     }
 
-    List<string> tokens =
-      core.algs.Tokenizer.CleanAndSplitToken(line);
+    using StreamReader reader = new StreamReader(stream);
 
-    Insert(tokens);
+    while (!reader.EndOfStream) {
+      string? line = reader.ReadLine();
+
+      if (string.IsNullOrWhiteSpace(line)) {
+        continue;
+      }
+
+      List<string> tokens = core.algs.Tokenizer.CleanAndSplitToken(line);
+      Insert(tokens);
+    }
   }
-}
 
   public void
   Insert(List<string> sequence) {
@@ -53,10 +49,20 @@ public void LoadFromStream(Stream stream) {
       next.AddParent(current);
 
       current = next;
-      i = i + 1;
+      i++;
     }
 
     current.IsTerminal = true;
+  }
+
+  private Node 
+  get_or_create(string value) {
+    if (!NodeMap.TryGetValue(value, out Node? node)) {
+      node = new Node(value);
+      NodeMap[value] = node;
+    }
+
+    return node;
   }
 
   public List<string>
@@ -163,6 +169,32 @@ public void LoadFromStream(Stream stream) {
     return null;
   }
 
+  public List<string>
+  Walk(string start, int steps) {
+    List<string> output = new List<string>();
+
+    if (!NodeMap.TryGetValue(start, out Node? current)) {
+      return output;
+    }
+
+    output.Add(current.Value);
+
+    int i = 0;
+    while (i < steps) {
+      Node? next = choose_next(current);
+
+      if (next == null) {
+        break;
+      }
+
+      output.Add(next.Value);
+      current = next;
+      i++;
+    }
+
+    return output;
+  }
+
   private Node?
   choose_next(Node node) {
     int total = 0;
@@ -189,33 +221,6 @@ public void LoadFromStream(Stream stream) {
     return null;
   }
 
-
-  public List<string>
-  Walk(string start, int steps) {
-    List<string> output = new List<string>();
-
-    if (!NodeMap.TryGetValue(start, out Node? current)) {
-      return output;
-    }
-
-    output.Add(current.Value);
-
-    int i = 0;
-    while (i < steps) {
-      Node? next = choose_next(current);
-
-      if (next == null) {
-        break;
-      }
-
-      output.Add(next.Value);
-      current = next;
-      i = i + 1;
-    }
-
-    return output;
-  }
-
   private Edge?
   get_best_edge(Node node) {
     Edge? best = null;
@@ -231,9 +236,58 @@ public void LoadFromStream(Stream stream) {
     return best;
   }
 
+  private Edge?
+  get_random_edge(Node node) {
+    int total = 0;
+
+    foreach (Edge edge in node.Children.Values) {
+      total += edge.Count;
+    }
+
+    if (total == 0) {
+      return null;
+    }
+
+    int roll = random_.Next(total);
+
+    foreach (Edge edge in node.Children.Values) {
+      roll -= edge.Count;
+
+      if (roll < 0) {
+        return edge;
+      }
+    }
+
+    return null;
+  }
+
   private int
   compare_suggestions(Suggestion a, Suggestion b) {
     return b.Weight.CompareTo(a.Weight);
+  }
+
+  private Node?
+  find_context(List<string> sequence) {
+    for (int length = sequence.Count; length > 0; length--) {
+      int start = sequence.Count - length;
+      string key = "";
+      int i = start;
+
+      while (i < sequence.Count) {
+        if (key.Length > 0) {
+          key += " ";
+        }
+
+        key += sequence[i];
+        i++;
+      }
+
+      if (NodeMap.TryGetValue(key, out Node? node)) {
+        return node;
+      }
+    }
+
+    return null;
   }
 
   public List<Suggestion>
@@ -244,20 +298,10 @@ public void LoadFromStream(Stream stream) {
       return suggestions;
     }
 
-    Node? current;
+    Node? current = find_context(sequence);
 
-    if (!NodeMap.TryGetValue(sequence[0], out current)) {
+    if (current == null) {
       return suggestions;
-    }
-
-    int i = 1;
-    while (i < sequence.Count) {
-      if (!current.Children.TryGetValue(sequence[i], out Edge? edge)) {
-        return suggestions;
-      }
-
-      current = edge.Target;
-      i++;
     }
 
     foreach (Edge edge in current.Children.Values) {
@@ -266,22 +310,21 @@ public void LoadFromStream(Stream stream) {
       int count = 0;
 
       while (count < preview_length) {
-        Edge? best = get_best_edge(walk);
+        Edge? next = get_random_edge(walk);
 
-        if (best == null) {
+        if (next == null) {
           break;
         }
 
-        preview.Add(best.Target.Value);
-
-        walk = best.Target;
-
+        preview.Add(next.Target.Value);
+        walk = next.Target;
         count++;
       }
 
       suggestions.Add(new Suggestion(edge.Target.Value, edge.Count, preview));
     }
 
+    // todo 2; i dislike using delegates
     suggestions.Sort(compare_suggestions);
 
     if (suggestions.Count > amount) {
@@ -328,12 +371,12 @@ public void LoadFromStream(Stream stream) {
       }
 
       current = edge.Target;
-      i = i + 1;
+      i++;
     }
 
     return current.IsTerminal;
   }
-
+/*
   private Node
   get_or_create(string value) {
     if (!NodeMap.TryGetValue(value, out Node? node)) {
@@ -344,6 +387,6 @@ public void LoadFromStream(Stream stream) {
     node.Weight = node.Weight + 1;
     return node;
   }
-
+*/
   private readonly Random random_ = new Random();
 }

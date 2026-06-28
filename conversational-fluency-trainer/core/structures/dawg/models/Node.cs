@@ -15,19 +15,13 @@ public class Node {
   }
 
   public void AddChild(Node node) {
-    if (Children.TryGetValue(node.Value, out Edge? edge)) {
-      edge.Increment();
-    }
-    else {
+    if (!Children.TryGetValue(node.Value, out Edge? edge)) {
       Children[node.Value] = new Edge(node);
     }
   }
 
   public void AddParent(Node node) {
-    if (Parents.TryGetValue(node.Value, out Edge? edge)) {
-      edge.Increment();
-    }
-    else {
+    if (!Parents.TryGetValue(node.Value, out Edge? edge)) {
       Parents[node.Value] = new Edge(node);
     }
   }

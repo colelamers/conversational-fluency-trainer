@@ -10,7 +10,6 @@ public class Edge {
   }
 
   public void Increment() {
-    Count = Count + 1;
+    Count++;
   }
-
 }
