@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace conversational_fluency_trainer.services.json_serializer;
+namespace core.services.json_serializer.models;
 // Define an explicit, traditional structure to hold the state
 // No tuples, no hidden variables.
 public struct 

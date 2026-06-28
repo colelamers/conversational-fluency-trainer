@@ -17,8 +17,9 @@ Paths {
       if (Environment.ProcessPath == null) {
         return "";
       }
-
-      return Environment.ProcessPath;
+        return System.Reflection.Assembly
+            .GetExecutingAssembly()
+            .Location;
     }
   }
 
@@ -354,43 +355,30 @@ Paths {
     }
   }
 
-  public static string 
-  ConfsDirectory {
-    get {
-      string root = core.infra.Paths.SolutionRoot;
-      if (String.IsNullOrWhiteSpace(root)) {
-        return "";
-      }
-
-      // Points to: ~/apps/conversation-fluency-trainer/confs
-      return Path.Combine(root, "confs");
-    }
-  }
-
+  // Points to: ~/apps/conversational-fluency-trainer/logs
   public static string 
   LogsDirectory {
     get {
       string root = core.infra.Paths.SolutionRoot;
-      if (String.IsNullOrWhiteSpace(root)) {
+      if (string.IsNullOrWhiteSpace(root)) {
         return "";
       }
 
-      // Points to: ~/apps/conversation-fluency-trainer/logs
       string path = Path.Combine(root, "logs");
       Directory.CreateDirectory(path);
       return path;
     }
   }
 
+  // Points to: ~/apps/conversational-fluency-trainer/deps
   public static string
   DepsDirectory {
     get {
       string root = core.infra.Paths.SolutionRoot;
-      if (String.IsNullOrWhiteSpace(root)) {
+      if (string.IsNullOrWhiteSpace(root)) {
         return "";
       }
 
-      // Points to: ~/apps/conversation-fluency-trainer/deps
       return Path.Combine(root, "deps");
     }
   }
@@ -403,7 +391,7 @@ Paths {
   ProjectFile {
     get {
       string root = core.infra.Paths.ProjectRoot;
-      if (String.IsNullOrWhiteSpace(root)) {
+      if (string.IsNullOrWhiteSpace(root)) {
         return "";
       }
 
@@ -449,7 +437,7 @@ Paths {
     SolutionFile {
       get {
         string root = core.infra.Paths.SolutionRoot;
-        if (String.IsNullOrWhiteSpace(root)) {
+        if (string.IsNullOrWhiteSpace(root)) {
           return "";
         }
 
@@ -497,6 +485,19 @@ Paths {
   // CONFIG
   // --------------------------------------------------------------------
 
+  // Points to: ~/apps/conversational-fluency-trainer/confs
+  public static string 
+  ConfsDirectory {
+    get {
+      string root = core.infra.Paths.SolutionRoot;
+      if (string.IsNullOrWhiteSpace(root)) {
+        return "";
+      }
+
+      return Path.Combine(root, "confs");
+    }
+  }
+
   // Linux:
   //   /home/soren/.config/MyApp
   // Windows:
@@ -504,7 +505,8 @@ Paths {
   public static string 
   ConfigDirectory {
     get {
-      string path = Path.Combine(core.infra.Paths.RoamingAppData, ExecutableFileNameWithoutExtension);
+      string path = Path.Combine(
+        core.infra.Paths.RoamingAppData, ExecutableFileNameWithoutExtension);
       Directory.CreateDirectory(path);
       return path;
     }
@@ -626,7 +628,7 @@ Paths {
   LinuxRuntimeTemp {
     get {
       string? runtime = Environment.GetEnvironmentVariable("XDG_RUNTIME_DIR");
-      if (!String.IsNullOrWhiteSpace(runtime)) {
+      if (!string.IsNullOrWhiteSpace(runtime)) {
         return runtime;
       }
 
@@ -649,12 +651,12 @@ Paths {
 
   private static FileInfo? 
   first_or_default(IEnumerable<FileInfo> files, string extension) {
-  foreach (FileInfo file in files) {
-    if (file.Extension == extension) {
-      return file;
+    foreach (FileInfo file in files) {
+      if (file.Extension == extension) {
+        return file;
+      }
     }
-  }
 
-  return null;
-}
+    return null;
+  }
 }

@@ -5,7 +5,8 @@ ConsecutiveChainResult {
   public int Lower { get; }
   public int Upper { get; }
 
-  public ConsecutiveChainResult(int lower, int upper) {
+  public 
+  ConsecutiveChainResult(int lower, int upper) {
     Lower = lower;
     Upper = upper;
   }

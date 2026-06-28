@@ -30,8 +30,8 @@ SlidingWindow {
     for (int i = 0; i <= prev.Count - prev_win; i++) {
       for (int j = 0; j <= cur.Count - cur_win; j++) {
 
-        WordWindow prev_window = new (prev, i, prev_win);
-        WordWindow cur_window = new (cur, j, cur_win);
+        WordWindow prev_window = new(prev, i, prev_win);
+        WordWindow cur_window = new(cur, j, cur_win);
 
         double sim;
         // todo 2; fix this. should not have an if like that

@@ -1,8 +1,9 @@
 using Serilog;
 using Serilog.Context;
 using Serilog.Events;
+using core.services.serilogging.models;
 
-namespace conversational_fluency_trainer.services.serilogging;
+namespace core.services.serilogging;
 
 public static class 
 SeriLogging {

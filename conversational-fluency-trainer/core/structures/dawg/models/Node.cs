@@ -1,28 +1,28 @@
-using System.Runtime.CompilerServices;
-
 namespace core.strucutres.dawg.models;
 
-public class 
-Node<T> where T : notnull {
-  public T Key;
-  public bool CanBeEndOfWord = false;
-  public int TraversalWeight = 0;
+public class Node {
+  public string Value;
+  public bool IsTerminal;
+  public int Weight;
 
-  public SortedDictionary<T, Node<T>> Children = new();
-  public SortedDictionary<T, Node<T>> Parents = new();
+  public Dictionary<string, Edge> Children;
+  public Dictionary<string, Edge> Parents;
 
-  public Node(T key) {
-    Key = key;
+  public Node(string value) {
+    Value = value;
+    Children = new Dictionary<string, Edge>();
+    Parents = new Dictionary<string, Edge>();
   }
 
-  public void 
-  AddChild(T child, Node<T> node) {
-    TraversalWeight = TraversalWeight + 1;
-    Children.Add(child, node);
+  public void AddChild(Node node) {
+    if (!Children.TryGetValue(node.Value, out Edge? edge)) {
+      Children[node.Value] = new Edge(node);
+    }
   }
 
-  public void
-   AddParent(T parent, Node<T> node) {
-    Parents.Add(parent, node);
+  public void AddParent(Node node) {
+    if (!Parents.TryGetValue(node.Value, out Edge? edge)) {
+      Parents[node.Value] = new Edge(node);
+    }
   }
 }
