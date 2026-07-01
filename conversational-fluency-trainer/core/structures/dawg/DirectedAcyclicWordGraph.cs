@@ -149,6 +149,19 @@ DirectedAcyclicWordGraph {
   }
 
   public List<string>
+  GetSequence(HashSet<int> ids) {
+    List<string> sequence = new();
+    foreach (int k_item in ids) {
+      string? str_val;
+      if (id_to_value_.TryGetValue(k_item, out str_val)) {
+        
+      }
+      sequence.Add(id_to_value_[k_item]);
+    }
+    return sequence;
+  }
+
+  public List<string>
   GetNext(string value) {
     List<string> result = new List<string>();
 
