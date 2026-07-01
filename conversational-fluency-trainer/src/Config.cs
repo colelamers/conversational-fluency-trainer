@@ -1,11 +1,14 @@
 namespace conversational_fluency_trainer.config_models;
-
-public class AppConfig {
+// todo 1; once app is in solid state, add unit tests
+// todo 2; i'd prefer constructors over initialization on same line
+public class 
+AppConfig {
   public WhisperConfig Whisper { get; set; } = new();
   public DawgConfig Dawg { get; set; } = new();
 }
 
-public class WhisperConfig {
+public class 
+WhisperConfig {
   public WhisperPaths FileNames { get; set; } = new();
 
   public WhisperArguments Arguments { get; set; } = new();
@@ -14,19 +17,21 @@ public class WhisperConfig {
   public HashSet<string> Filters { get; set; } = new();
 }
 
-public class WhisperPaths {
+public class 
+WhisperPaths {
   public string Executable { get; set; } = "";
   public string Model { get; set; } = "";
 }
 
-public class WhisperArguments {
+public class 
+WhisperArguments {
   public int Threads { get; set; }
   public string Language { get; set; } = "";
-  public int Processors { get; set; }
+  public int MicHardwareNumber { get; set; }
 }
 
-
-public class WhisperProcess {
+public class 
+WhisperProcess {
   public bool RedirectOutput { get; set; }
   public bool RedirectError { get; set; }
   public bool RedirectInput { get; set; }
@@ -35,7 +40,7 @@ public class WhisperProcess {
   public bool CreateNoWindow { get; set; }
 }
 
-
-public class DawgConfig {
+public class 
+DawgConfig {
   public string TrainingDirectory { get; set; } = "";
 }

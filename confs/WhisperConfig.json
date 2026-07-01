@@ -8,7 +8,7 @@
     "Arguments": {
       "Threads": 8,
       "Language": "de",
-      "Processors": 2
+      "MicHardwareNumber": 1
     },
 
     "Process": {

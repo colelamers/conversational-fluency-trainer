@@ -2,6 +2,7 @@ using System.Diagnostics;
 using core.strucutres.dawg;
 using core.strucutres.dawg.models;
 using core.services.json_serializer;
+
 namespace conversational_fluency_trainer;
 
 public class
@@ -11,14 +12,14 @@ WhisperRunner {
     config_ = new JsonSerializer($"{k_dir}/WhisperConfig.json")
       .Deserialize<config_models.AppConfig>();
   }
+
   public async Task
   RunAsync() {
-    
     string k_deps = core.infra.Paths.DepsDirectory;
     string model = $"-m \"{k_deps}/{config_.Whisper.FileNames.Model}\"";
     string threads = $"-t {config_.Whisper.Arguments.Threads}";
     string language = $"-l {config_.Whisper.Arguments.Language}";
-    string processors = $"-c {config_.Whisper.Arguments.Processors}";
+    string processors = $"-c {config_.Whisper.Arguments.MicHardwareNumber}";
 
     ProcessStartInfo psi = new() {
       FileName = $"{k_deps}/{config_.Whisper.FileNames.Executable}",
@@ -49,15 +50,12 @@ WhisperRunner {
   private void
   on_output_data_received(object sender, DataReceivedEventArgs e) {
     if (!string.IsNullOrWhiteSpace(e.Data)) {
-      List<string> words = core.algs.Tokenizer.CleanSplitFilterToken(e.Data, config_.Whisper.Filters);
+      List<string> words = core.algs.Tokenizer.CleanSplitFilterToken(
+        e.Data, config_.Whisper.Filters);
       said_words_.Insert(words);
       if (words.Count > 0) {
         Console.WriteLine("STDOUT: " + e.Data);
-        List<Suggestion> suggestions = said_words_.GetSuggestions(words, 5, 5);
         Console.WriteLine("DAWG suggestions:");
-        foreach (Suggestion item in suggestions) {
-          Console.WriteLine("\t\t" + item.Value + " (" + item.Weight + ") - " + string.Join(" ", item.Preview));
-        }
       }
     }
   }
@@ -75,15 +73,15 @@ WhisperRunner {
     int loaded = 0;
 
     foreach (string file in Directory.EnumerateFiles(directory, "*.txt")) {
-      using FileStream stream = File.OpenRead(file);
+      using (FileStream stream = File.OpenRead(file)) {
+        dawg.LoadFromStream(stream);
+      }
 
-      dawg.LoadFromStream(stream);
       loaded++;
 
       Console.WriteLine($"Loaded {loaded}: {Path.GetFileName(file)}");
     }
 
-    Console.WriteLine($"Training complete. Files: {loaded}, Nodes: {dawg.NodeMap.Count}");
     return dawg;
   }
 
