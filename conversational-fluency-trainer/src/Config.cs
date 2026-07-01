@@ -1,5 +1,6 @@
 namespace conversational_fluency_trainer.config_models;
-
+// todo 1; once app is in solid state, add unit tests
+// todo 2; i'd prefer constructors over initialization on same line
 public class 
 AppConfig {
   public WhisperConfig Whisper { get; set; } = new();
@@ -26,7 +27,7 @@ public class
 WhisperArguments {
   public int Threads { get; set; }
   public string Language { get; set; } = "";
-  public int Processors { get; set; }
+  public int MicHardwareNumber { get; set; }
 }
 
 public class 

@@ -1,28 +1,15 @@
+using System.Collections.Generic;
+
 namespace core.strucutres.dawg.models;
 
 public class Node {
-  public string Value;
-  public bool IsTerminal;
-  public int Weight;
+    public int Id { get; set; }
+    public string Value { get; set; }
+    public bool IsTerminal { get; set; }
 
-  public Dictionary<string, Edge> Children;
-  public Dictionary<string, Edge> Parents;
-
-  public Node(string value) {
-    Value = value;
-    Children = new Dictionary<string, Edge>();
-    Parents = new Dictionary<string, Edge>();
-  }
-
-  public void AddChild(Node node) {
-    if (!Children.TryGetValue(node.Value, out Edge? edge)) {
-      Children[node.Value] = new Edge(node);
+    public Node(int id, string value) {
+        Id = id;
+        Value = value;
+        IsTerminal = false;
     }
-  }
-
-  public void AddParent(Node node) {
-    if (!Parents.TryGetValue(node.Value, out Edge? edge)) {
-      Parents[node.Value] = new Edge(node);
-    }
-  }
 }
