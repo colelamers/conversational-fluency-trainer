@@ -7,7 +7,7 @@ DirectedAcyclicWordGraph {
   private Dictionary<string, Node> node_map_ = new();
   private Dictionary<int, string> id_to_value_ = new();
   private Dictionary<int, HashSet<int>> next_ = new();
-  private Dictionary<string, HashSet<int>> word_sequence_ids_ = new();
+  private Dictionary<int, List<int>> sequence_node_ids_ = new();
   private int next_sequence_id_;
   private int next_id_ = 0;
 
@@ -44,12 +44,17 @@ DirectedAcyclicWordGraph {
     int sequence_id = next_sequence_id_;
     next_sequence_id_++;
 
+    List<int> node_ids = new List<int>();
     Node? previous_node = null;
 
     for (int i = 0; i < sequence.Count; i++) {
       Node? current_node = get_or_create(sequence[i]);
 
-      register_sequence_membership(sequence[i], sequence_id);
+      node_ids.Add(current_node.Id);
+
+      if (i == 0) {
+        current_node.IsSequenceStart = true;
+      }
 
       if (previous_node != null) {
         add_edge(previous_node.Id, current_node.Id);
@@ -62,19 +67,9 @@ DirectedAcyclicWordGraph {
       previous_node = current_node;
     }
 
+    sequence_node_ids_[sequence_id] = node_ids;
+
     return sequence_id;
-  }
-
-  private void
-  register_sequence_membership(string value, int sequence_id) {
-    HashSet<int>? ids = null;
-
-    if (!word_sequence_ids_.TryGetValue(value, out ids)) {
-      ids = new HashSet<int>();
-      word_sequence_ids_[value] = ids;
-    }
-
-    ids.Add(sequence_id);
   }
 
   public Node?
@@ -137,28 +132,72 @@ DirectedAcyclicWordGraph {
     return edges.Contains(to_node.Id);
   }
 
-  public HashSet<int> 
+  public HashSet<int>
   GetSequenceIds(string value) {
-    HashSet<int>? ids = null;
+    HashSet<int> result = new HashSet<int>();
 
-    if (word_sequence_ids_.TryGetValue(value, out ids)) {
-      return ids;
+    Node? node = null;
+
+    if (!node_map_.TryGetValue(value.ToLower(), out node)) {
+      return result;
     }
 
-    return new HashSet<int>();
+    foreach (KeyValuePair<int, List<int>> entry in sequence_node_ids_) {
+      if (entry.Value.Contains(node.Id)) {
+        result.Add(entry.Key);
+      }
+    }
+
+    return result;
   }
 
   public List<string>
-  GetSequence(HashSet<int> ids) {
-    List<string> sequence = new();
-    foreach (int k_item in ids) {
-      string? str_val;
-      if (id_to_value_.TryGetValue(k_item, out str_val)) {
-        
-      }
-      sequence.Add(id_to_value_[k_item]);
+  GetSequence(int sequence_id) {
+    List<int>? node_ids = null;
+
+    if (!sequence_node_ids_.TryGetValue(sequence_id, out node_ids)) {
+      return new List<string>();
     }
-    return sequence;
+
+    return resolve_node_ids(node_ids);
+  }
+
+  public List<string>
+  GetSequence(string value, int sequence_id) {
+    Node? start_node = null;
+
+    if (!node_map_.TryGetValue(value, out start_node)) {
+      return new List<string>();
+    }
+
+    List<int>? node_ids = null;
+
+    if (!sequence_node_ids_.TryGetValue(sequence_id, out node_ids)) {
+      return new List<string>();
+    }
+
+    int start_index = node_ids.IndexOf(start_node.Id);
+
+    if (start_index < 0) {
+      return new List<string>();
+    }
+
+    List<int> tail_ids = node_ids.GetRange(start_index, node_ids.Count - start_index);
+
+    return resolve_node_ids(tail_ids);
+  }
+
+  private List<string>
+  resolve_node_ids(List<int> node_ids) {
+    List<string> result = new List<string>();
+
+    foreach (int node_id in node_ids) {
+      if (id_to_value_.TryGetValue(node_id, out string? word)) {
+        result.Add(word);
+      }
+    }
+
+    return result;
   }
 
   public List<string>
